@@ -1,0 +1,1090 @@
+<meta charset="utf-8">
+<title>Salonbyggeren</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+:root{
+  --ground:#F5F4F7; --surface:#FFFFFF; --surface-2:#EEECF4; --surface-3:#E5E2EE;
+  --line:#DEDAE8; --line-strong:#C3BCD4;
+  --ink:#1B1722; --ink-2:#4B4459; --ink-3:#7B7389;
+  --accent:#5A3FA0; --accent-2:#3E2B72; --accent-soft:#EBE5FA; --on-accent:#FFFFFF;
+  --good:#1F6B4E; --good-soft:#E0F0E8;
+  --warn:#8A5A10; --warn-soft:#F7EBD6;
+  --crit:#992E3D; --crit-soft:#F8E3E6;
+  --brass:#7E6224; --brass-soft:#F3EDDC;
+  --shadow-sm:0 1px 2px rgba(27,23,34,.06);
+  --shadow:0 1px 2px rgba(27,23,34,.05), 0 10px 28px -16px rgba(27,23,34,.30);
+  --radius:10px;
+  --serif:"Bodoni Moda", "Times New Roman", serif;
+  --sans:"Archivo", "Helvetica Neue", Arial, sans-serif;
+  --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --ground:#141119; --surface:#1D1926; --surface-2:#262133; --surface-3:#2F2940;
+    --line:#332C44; --line-strong:#4A4160;
+    --ink:#F2EFF7; --ink-2:#BEB6CD; --ink-3:#8C8499;
+    --accent:#B49BF5; --accent-2:#CDBBFF; --accent-soft:#2B2242; --on-accent:#1A1424;
+    --good:#6FD4A7; --good-soft:#15302A;
+    --warn:#E6B468; --warn-soft:#332710;
+    --crit:#F19BA7; --crit-soft:#3A1E24;
+    --brass:#D8B36B; --brass-soft:#2E2716;
+    --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -16px rgba(0,0,0,.8);
+  }
+}
+:root[data-theme="dark"]{
+  --ground:#141119; --surface:#1D1926; --surface-2:#262133; --surface-3:#2F2940;
+  --line:#332C44; --line-strong:#4A4160;
+  --ink:#F2EFF7; --ink-2:#BEB6CD; --ink-3:#8C8499;
+  --accent:#B49BF5; --accent-2:#CDBBFF; --accent-soft:#2B2242; --on-accent:#1A1424;
+  --good:#6FD4A7; --good-soft:#15302A;
+  --warn:#E6B468; --warn-soft:#332710;
+  --crit:#F19BA7; --crit-soft:#3A1E24;
+  --brass:#D8B36B; --brass-soft:#2E2716;
+  --shadow-sm:0 1px 2px rgba(0,0,0,.4);
+  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -16px rgba(0,0,0,.8);
+}
+
+*{box-sizing:border-box}
+body{
+  margin:0; background:var(--ground); color:var(--ink);
+  font-family:var(--sans); font-size:15px; line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+h1,h2,h3,h4{margin:0; text-wrap:balance; font-weight:500}
+p{margin:0}
+button{font:inherit; color:inherit}
+:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+@media (prefers-reduced-motion: reduce){*{animation:none!important; transition:none!important}}
+
+/* ---------- chrome ---------- */
+.proto{
+  background:var(--ink); color:var(--ground);
+  font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase;
+  padding:7px 20px; display:flex; gap:14px; flex-wrap:wrap; justify-content:center; text-align:center;
+}
+.proto span{opacity:.62}
+.masthead{
+  border-bottom:1px solid var(--line); background:var(--surface);
+  position:sticky; top:0; z-index:30;
+}
+.masthead-in{
+  max-width:1200px; margin:0 auto; padding:14px 24px;
+  display:flex; align-items:center; gap:18px; justify-content:space-between;
+}
+.brand{display:flex; align-items:baseline; gap:10px; min-width:0}
+.brand b{font-family:var(--serif); font-size:21px; font-weight:500; letter-spacing:.01em}
+.brand em{
+  font-family:var(--mono); font-style:normal; font-size:10.5px; letter-spacing:.13em;
+  text-transform:uppercase; color:var(--ink-3); white-space:nowrap;
+}
+.steps{display:flex; gap:6px; align-items:center; list-style:none; margin:0; padding:0}
+.steps li{
+  width:34px; height:4px; border-radius:2px; background:var(--surface-3);
+}
+.steps li.done{background:var(--accent)}
+.steps li.now{background:var(--accent); box-shadow:0 0 0 3px var(--accent-soft)}
+.step-label{font-family:var(--mono); font-size:11px; color:var(--ink-3); letter-spacing:.06em; white-space:nowrap}
+@media(max-width:720px){ .steps{display:none} }
+
+/* ---------- layout ---------- */
+.wrap{max-width:1200px; margin:0 auto; padding:34px 24px 90px}
+.bench{display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:44px; align-items:start}
+@media(max-width:1000px){ .bench{grid-template-columns:1fr; gap:30px} }
+.bench.solo{grid-template-columns:minmax(0,1fr)}
+.bench.solo .stage{max-width:900px}
+
+.eyebrow{
+  font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--accent); margin-bottom:12px; display:flex; gap:9px; align-items:center;
+}
+.eyebrow::before{content:""; width:20px; height:1px; background:var(--accent); flex:none}
+.stage h2{font-family:var(--serif); font-size:clamp(28px,3.6vw,40px); line-height:1.12; letter-spacing:-.01em}
+.lede{color:var(--ink-2); max-width:60ch; margin-top:12px; font-size:16px}
+.stage section{margin-top:34px}
+.stage h3{
+  font-size:13px; font-family:var(--mono); letter-spacing:.1em; text-transform:uppercase;
+  color:var(--ink-3); margin-bottom:14px; padding-bottom:9px; border-bottom:1px solid var(--line);
+}
+
+/* ---------- controls ---------- */
+.opts{display:grid; gap:10px}
+.opts.two{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.opts.par{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:520px){ .opts.par{grid-template-columns:1fr} }
+.opt{
+  display:flex; gap:13px; align-items:flex-start; text-align:left; width:100%;
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  padding:14px 16px; cursor:pointer; transition:border-color .15s, background .15s;
+}
+.opt:hover{border-color:var(--line-strong)}
+.opt .tick{
+  flex:none; width:18px; height:18px; border-radius:50%; border:1.5px solid var(--line-strong);
+  margin-top:2px; display:grid; place-items:center;
+}
+.opt.sq .tick{border-radius:5px}
+.opt[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft)}
+.opt[aria-pressed="true"] .tick{border-color:var(--accent); background:var(--accent)}
+.opt[aria-pressed="true"] .tick::after{content:""; width:7px; height:7px; border-radius:50%; background:var(--on-accent)}
+.opt.sq[aria-pressed="true"] .tick::after{
+  width:5px; height:9px; border-radius:0; background:none;
+  border:solid var(--on-accent); border-width:0 2px 2px 0; transform:rotate(42deg) translate(-1px,-1px);
+}
+.opt strong{display:block; font-weight:600; font-size:14.5px}
+.opt small{display:block; color:var(--ink-3); font-size:13px; line-height:1.45; margin-top:3px}
+
+.rows{border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; background:var(--surface)}
+.row{
+  display:flex; align-items:center; gap:16px; padding:13px 16px;
+  border-bottom:1px solid var(--line);
+}
+.row:last-child{border-bottom:0}
+.row .txt{flex:1; min-width:0}
+.row .txt strong{display:block; font-weight:600; font-size:14.5px}
+.row .txt small{color:var(--ink-3); font-size:12.5px}
+.stepper{display:flex; align-items:center; gap:2px; flex:none}
+.stepper button{
+  width:32px; height:32px; border-radius:7px; border:1px solid var(--line-strong);
+  background:var(--surface); cursor:pointer; font-size:17px; line-height:1;
+  display:grid; place-items:center; transition:background .12s;
+}
+.stepper button:hover:not(:disabled){background:var(--surface-2)}
+.stepper button:disabled{opacity:.32; cursor:default}
+.stepper output{
+  min-width:38px; text-align:center; font-family:var(--mono); font-size:16px;
+  font-variant-numeric:tabular-nums;
+}
+
+/* ---------- rail ---------- */
+.rail{position:sticky; top:86px; display:grid; gap:14px}
+@media(max-width:1000px){ .rail{position:static} }
+.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius)}
+.rail-head{
+  padding:15px 17px 13px; border-bottom:1px solid var(--line);
+  display:flex; justify-content:space-between; align-items:baseline; gap:10px;
+}
+.rail-head h4{font-family:var(--serif); font-size:19px}
+.rail-head span{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3)}
+.spec{padding:6px 17px 14px; margin:0; display:grid; gap:0}
+.spec div{
+  display:flex; justify-content:space-between; gap:12px; align-items:baseline;
+  padding:8px 0; border-bottom:1px dotted var(--line);
+}
+.spec div:last-child{border-bottom:0}
+.spec dt{color:var(--ink-2); font-size:13.5px}
+.spec dd{margin:0; font-family:var(--mono); font-size:13.5px; font-variant-numeric:tabular-nums; text-align:right}
+.spec dd i{font-style:normal; color:var(--accent); font-size:12px}
+.spec .muted dd{color:var(--ink-3)}
+.rail-note{
+  padding:12px 17px; background:var(--surface-2); border-top:1px solid var(--line);
+  font-size:12.5px; color:var(--ink-2); display:flex; gap:9px; align-items:flex-start;
+  border-radius:0 0 var(--radius) var(--radius);
+}
+.rail-note b{font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); flex:none}
+
+/* ---------- insights ---------- */
+.insight{
+  background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--ink-3);
+  border-radius:var(--radius); padding:16px 18px; display:grid; gap:9px;
+}
+.insight.kritisk{border-left-color:var(--crit)}
+.insight.anbefalet{border-left-color:var(--warn)}
+.insight.info{border-left-color:var(--accent)}
+.insight-top{display:flex; gap:11px; align-items:center; flex-wrap:wrap}
+.tag{
+  font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+  padding:3px 8px; border-radius:20px; white-space:nowrap;
+}
+.tag.kritisk{background:var(--crit-soft); color:var(--crit)}
+.tag.anbefalet{background:var(--warn-soft); color:var(--warn)}
+.tag.info{background:var(--accent-soft); color:var(--accent)}
+.insight h4{font-size:16px; font-weight:600; line-height:1.3}
+.insight p{color:var(--ink-2); font-size:14px; max-width:62ch}
+.insight .src{font-family:var(--mono); font-size:11px; color:var(--ink-3)}
+.addon{
+  margin-top:4px; display:flex; align-items:center; gap:12px; justify-content:space-between;
+  background:var(--surface-2); border-radius:8px; padding:11px 13px; flex-wrap:wrap;
+}
+.addon .lbl{font-size:13.5px; font-weight:600}
+.addon .lbl small{display:block; font-weight:400; color:var(--ink-3); font-size:12.5px}
+.toggle{
+  border:1px solid var(--line-strong); background:var(--surface); border-radius:20px;
+  padding:6px 13px 6px 9px; display:flex; align-items:center; gap:8px; cursor:pointer;
+  font-size:13px; font-weight:500; white-space:nowrap;
+}
+.toggle .dot{width:15px; height:15px; border-radius:50%; border:1.5px solid var(--line-strong); display:grid; place-items:center}
+.toggle[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-2)}
+.toggle[aria-pressed="true"] .dot{background:var(--accent); border-color:var(--accent)}
+.toggle[aria-pressed="true"] .dot::after{
+  content:""; width:4px; height:8px; border:solid var(--on-accent); border-width:0 2px 2px 0;
+  transform:rotate(42deg) translate(-1px,-1px);
+}
+
+/* ---------- price ---------- */
+.pricehead{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  padding:24px 26px; display:grid; gap:18px; box-shadow:var(--shadow);
+}
+.pricehead .pkg{font-family:var(--serif); font-size:clamp(24px,3vw,32px); line-height:1.15}
+.pricehead .sub{color:var(--ink-2); font-size:14.5px}
+.figs{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:2px; background:var(--line); border-radius:8px; overflow:hidden}
+.fig{background:var(--surface); padding:14px 16px}
+.fig dt{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3)}
+.fig dd{margin:5px 0 0; font-size:22px; font-family:var(--mono); font-variant-numeric:tabular-nums; letter-spacing:-.02em}
+.fig.hero{background:var(--accent-soft)}
+.fig.hero dd{color:var(--accent-2)}
+.fig.save dd{color:var(--good)}
+.fig small{display:block; font-size:12px; color:var(--ink-3); font-family:var(--sans); margin-top:3px}
+
+table.lines{width:100%; border-collapse:collapse; font-size:14px}
+table.lines th{
+  text-align:left; font-family:var(--mono); font-size:10.5px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink-3); font-weight:400;
+  padding:9px 10px; border-bottom:1px solid var(--line-strong);
+}
+table.lines td{padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top}
+table.lines td.n, table.lines th.n{text-align:right; font-family:var(--mono); font-variant-numeric:tabular-nums; white-space:nowrap}
+table.lines td.was{color:var(--ink-3); text-decoration:line-through}
+table.lines tr.grp td{
+  background:var(--surface-2); font-family:var(--mono); font-size:10.5px; letter-spacing:.1em;
+  text-transform:uppercase; color:var(--ink-2); padding:7px 10px;
+}
+table.lines tr.sum td{border-top:1.5px solid var(--ink); border-bottom:0; font-weight:600; font-size:15px; padding-top:12px}
+.scroll{overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface)}
+
+.seg{display:inline-flex; background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:3px; gap:3px}
+.seg button{
+  border:0; background:none; padding:7px 14px; border-radius:6px; cursor:pointer;
+  font-size:13.5px; font-family:var(--mono); font-variant-numeric:tabular-nums;
+}
+.seg button[aria-pressed="true"]{background:var(--accent); color:var(--on-accent)}
+
+.slider{display:grid; gap:7px}
+.slider .top{display:flex; justify-content:space-between; align-items:baseline; gap:12px}
+.slider label{font-size:13.5px; color:var(--ink-2)}
+.slider output{font-family:var(--mono); font-size:14px; font-variant-numeric:tabular-nums}
+input[type=range]{width:100%; accent-color:var(--accent)}
+
+.case{display:grid; gap:14px; background:var(--brass-soft); border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px}
+.case h4{font-family:var(--serif); font-size:21px}
+.case .verdict{font-size:15px; color:var(--ink); max-width:62ch}
+.case .verdict b{color:var(--brass)}
+
+/* ---------- form ---------- */
+form.lead{display:grid; gap:14px; max-width:560px}
+.field{display:grid; gap:6px}
+.field label{font-size:13px; font-weight:600}
+.field input, .field select{
+  font:inherit; padding:11px 13px; border-radius:8px; border:1px solid var(--line-strong);
+  background:var(--surface); color:var(--ink); width:100%;
+}
+.field .hint{font-size:12.5px; color:var(--ink-3)}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+@media(max-width:560px){ .grid2{grid-template-columns:1fr} }
+.consent{display:flex; gap:11px; align-items:flex-start; font-size:13.5px; color:var(--ink-2); line-height:1.5}
+.consent input{margin-top:3px; width:17px; height:17px; accent-color:var(--accent); flex:none}
+
+/* ---------- buttons ---------- */
+.actions{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:32px}
+.btn{
+  border:1px solid transparent; border-radius:9px; padding:12px 22px; cursor:pointer;
+  font-weight:600; font-size:14.5px; display:inline-flex; align-items:center; gap:9px;
+  transition:background .14s, border-color .14s;
+}
+.btn.primary{background:var(--accent); color:var(--on-accent)}
+.btn.primary:hover{background:var(--accent-2)}
+.btn.ghost{background:transparent; border-color:var(--line-strong); color:var(--ink-2)}
+.btn.ghost:hover{background:var(--surface-2)}
+.btn:disabled{opacity:.45; cursor:default}
+.btn.primary:disabled:hover{background:var(--accent)}
+
+.next{display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
+.nextcard{
+  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
+  padding:16px 18px; display:grid; gap:5px;
+}
+.nextcard b{font-size:14.5px}
+.nextcard small{color:var(--ink-3); font-size:13px; line-height:1.45}
+.nextcard .go{font-family:var(--mono); font-size:11.5px; color:var(--accent); letter-spacing:.05em; margin-top:4px}
+
+.status{font-size:13.5px; color:var(--ink-2); min-height:20px}
+.status.err{color:var(--crit)}
+.status.ok{color:var(--good)}
+
+.callout{
+  border:1px dashed var(--line-strong); border-radius:var(--radius); padding:14px 16px;
+  font-size:13.5px; color:var(--ink-2); background:var(--surface-2);
+}
+.callout b{color:var(--ink)}
+
+/* report inline */
+.report{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:26px 28px; display:grid; gap:26px}
+.report h3{margin-top:0}
+@media print{
+  .proto, .masthead, .rail, .actions, .no-print{display:none!important}
+  body{background:#fff; color:#000}
+  .wrap{padding:0; max-width:none}
+  .bench{grid-template-columns:1fr}
+  .report{border:0; padding:0}
+}
+</style>
+
+<div class="proto">
+  Prototype · konceptoplæg <span>Priser og produkter er eksempeldata — ikke et tilbud</span>
+</div>
+
+<header class="masthead">
+  <div class="masthead-in">
+    <div class="brand">
+      <b>Salonbyggeren</b>
+      <em>Just Add People</em>
+    </div>
+    <div style="display:flex; align-items:center; gap:14px">
+      <span class="step-label" id="stepLabel">Trin 1 af 6</span>
+      <ol class="steps" id="stepDots"></ol>
+    </div>
+  </div>
+</header>
+
+<div class="wrap">
+  <div class="bench">
+    <main class="stage" id="stage"></main>
+    <aside class="rail" id="rail"></aside>
+  </div>
+</div>
+
+<script>
+"use strict";
+
+/* ============================================================
+   Salonbyggeren — prototype
+   Alle produkter, priser og beregninger er EKSEMPELDATA.
+   ============================================================ */
+
+const kr = n => new Intl.NumberFormat('da-DK',{maximumFractionDigits:0}).format(Math.round(n)) + ' kr.';
+const pl = (n, e, f) => n + ' ' + (n === 1 ? e : f);
+const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+
+/* ---------- niveauer og stil ---------- */
+const NIVEAUER = [
+  {id:'solid',    navn:'Solid',    desc:'Gode arbejdsheste fra eget lager. Hurtig levering, ærlig pris.'},
+  {id:'kvalitet', navn:'Kvalitet', desc:'Bedre polstring, mekanik og materialer. Bygget til ti år i drift.'},
+  {id:'premium',  navn:'Premium',  desc:'Japansk og italiensk topklasse. Her er oplevelsen selve produktet.'}
+];
+const STILARTER = [
+  {id:'nordisk', navn:'Lys nordisk', desc:'Ask, hvid keramik og sort stål. Roligt og let at holde rent.'},
+  {id:'raa',     navn:'Rå og urban', desc:'Beton, mørkt stål og cognacfarvet læder. Markant og maskulint.'},
+  {id:'japansk', navn:'Japansk ro',  desc:'Valnød, dæmpet lys og bløde former. Bygget til lange behandlinger.'}
+];
+
+/* ---------- produktkatalog (eksempeldata) ---------- */
+const KATALOG = [
+  {id:'stol',      navn:'Frisørstol',                  gruppe:'Klippepladser', per:'klip',      priser:{solid:[4299,3499],   kvalitet:[8995,6995],   premium:[16500,12900]}},
+  {id:'spejl',     navn:'Spejlkonsol med opbevaring',  gruppe:'Klippepladser', per:'klip',      priser:{solid:[3195,2295],   kvalitet:[4795,3495],   premium:[8400,5900]}},
+  {id:'rullebord', navn:'Rullebord',                   gruppe:'Klippepladser', per:'klip',      priser:{solid:[1295,995],    kvalitet:[1995,1495],   premium:[3200,2400]}},
+  {id:'fodstotte', navn:'Fodstøtte',                   gruppe:'Klippepladser', per:'klip',      priser:{solid:[649,449],     kvalitet:[895,649],     premium:[1350,995]}},
+
+  {id:'vaskeunit', navn:'Vaskeunit med keramikvask',   gruppe:'Vaskepladser',  per:'vask',      priser:{solid:[6499,4999],   kvalitet:[12900,9900],  premium:[23900,18500]}},
+  {id:'vasketab',  navn:'Sadelstol til vaskepladsen',  gruppe:'Vaskepladser',  per:'vask',      priser:{solid:[1795,1295],   kvalitet:[2795,1995],   premium:[4400,3200]}},
+
+  {id:'farvebar',  navn:'Farvebar med opbevaring',     gruppe:'Farvebar',      per:'farve',     priser:{solid:[4990,3900],   kvalitet:[8400,6500],   premium:[14200,11000]}},
+  {id:'farvevogn', navn:'Farvevogn',                   gruppe:'Farvebar',      per:'farve',     priser:{solid:[1695,1295],   kvalitet:[2590,1995],   premium:[3800,2900]}},
+
+  {id:'lounge',    navn:'Loungestol',                  gruppe:'Venteområde',   per:'lounge',    priser:{solid:[2495,1895],   kvalitet:[3890,2995],   premium:[6300,4900]}},
+  {id:'sofabord',  navn:'Sofabord',                    gruppe:'Venteområde',   per:'loungeSet', priser:{solid:[1695,1295],   kvalitet:[2590,1995],   premium:[4400,3400]}},
+
+  {id:'disk',      navn:'Receptionsdisk',              gruppe:'Reception',     per:'reception', priser:{solid:[9900,7900],   kvalitet:[15900,12500], premium:[25400,19900]}},
+  {id:'diskstol',  navn:'Receptionsstol',              gruppe:'Reception',     per:'reception', priser:{solid:[1695,1295],   kvalitet:[2590,1995],   premium:[4200,3200]}},
+
+  {id:'hsvask',    navn:'Head Spa vaskestol, liggende',gruppe:'Head Spa',      per:'headspa',   priser:{solid:[42900,34900], kvalitet:[59900,49000], premium:[88000,72000]}},
+  {id:'hsstol',    navn:'Head Spa behandlerstol',      gruppe:'Head Spa',      per:'headspa',   priser:{solid:[15900,12900], kvalitet:[23400,18900], premium:[32900,26500]}},
+  {id:'hsmist',    navn:'Hair steamer til damp',       gruppe:'Head Spa',      per:'headspa',   priser:{solid:[18400,14900], kvalitet:[24900,19900], premium:[30900,24900]}}
+];
+
+const TILVALG = [
+  {id:'lys',       navn:'Arbejdsbelysning med CRI 95',        enhed:'pr. klippeplads', per:'klip',  priser:{solid:[2190,1690], kvalitet:[3290,2490], premium:[4900,3900]}},
+  {id:'udsugning', navn:'Punktudsugning ved farvebaren',      enhed:'pr. farvebar',    per:'farve', priser:{solid:[5400,4200], kvalitet:[7400,5900], premium:[11200,8900]}},
+  {id:'sadelstol', navn:'Ergonomisk sadelstol med hæve/sænk', enhed:'pr. arbejdsplads',per:'klip',  priser:{solid:[2890,2290], kvalitet:[4190,3290], premium:[6200,4900]}},
+  {id:'maatte',    navn:'Ergonomisk gulvmåtte',               enhed:'pr. klippeplads', per:'klip',  priser:{solid:[1090,790],  kvalitet:[1490,1090], premium:[2100,1590]}},
+  {id:'akustik',   navn:'Akustikpaneler til loftet',          enhed:'sæt til salonen', per:'salon', priser:{solid:[6400,4900], kvalitet:[9200,7200], premium:[13500,10500]}},
+  {id:'montering', navn:'Levering, montering og bortkørsel',  enhed:'hele salonen',    per:'salon', priser:{solid:[6900,5400], kvalitet:[8900,6900], premium:[12500,9900]}}
+];
+
+/* ---------- tilstand ---------- */
+const S = {
+  step:0,
+  nu:{klip:2, vask:1, alder:'6-10'},
+  symptomer:['ryg','ko'],
+  ambition:['kapacitet'],
+  plan:{klip:3, vask:2, farve:1, lounge:3, reception:1, headspa:0},
+  planInit:false,
+  niveau:'kvalitet',
+  stil:'nordisk',
+  tilvalg:{}, rort:{},
+  leasing:36,
+  bon:520, behDag:4, db:40, hsUge:5, hsPris:640,
+  lead:{navn:'', salon:'', email:'', tlf:'', post:'', horisont:'3-6'},
+  sendt:false
+};
+
+const TRIN = [
+  {id:'nu',        navn:'Din salon i dag'},
+  {id:'symptomer', navn:'Hverdagen'},
+  {id:'ambition',  navn:'Ambition'},
+  {id:'plan',      navn:'Byg salonen'},
+  {id:'indsigter', navn:'Faglige indsigter'},
+  {id:'pris',      navn:'Pakke og pris'}
+];
+
+/* ---------- beregning ---------- */
+function antal(per){
+  const P = S.plan;
+  if (per === 'klip') return P.klip;
+  if (per === 'vask') return P.vask;
+  if (per === 'farve') return P.farve;
+  if (per === 'lounge') return P.lounge;
+  if (per === 'loungeSet') return P.lounge > 0 ? 1 : 0;
+  if (per === 'reception') return P.reception;
+  if (per === 'headspa') return P.headspa;
+  if (per === 'salon') return 1;
+  return 0;
+}
+
+function beregn(){
+  const grupper = [];
+  const push = (gruppe, navn, stk, pr) => {
+    if (stk <= 0) return;
+    let g = grupper.find(x => x.navn === gruppe);
+    if (!g) { g = {navn:gruppe, linjer:[]}; grupper.push(g); }
+    g.linjer.push({navn, stk, vejl:pr[0], pris:pr[1], sumVejl:pr[0]*stk, sumPris:pr[1]*stk});
+  };
+  KATALOG.forEach(i => push(i.gruppe, i.navn, antal(i.per), i.priser[S.niveau]));
+  TILVALG.forEach(t => { if (S.tilvalg[t.id]) push('Tilvalg fra dine indsigter', t.navn, antal(t.per), t.priser[S.niveau]); });
+
+  let vejl = 0, pris = 0, stk = 0;
+  grupper.forEach(g => g.linjer.forEach(l => { vejl += l.sumVejl; pris += l.sumPris; stk += l.stk; }));
+  return {grupper, vejl, pris, stk, spar: vejl - pris};
+}
+
+function ydelse(total, mdr){
+  const r = 0.084/12, rest = 100;
+  const pv = total - rest/Math.pow(1+r, mdr);
+  return pv * r / (1 - Math.pow(1+r, -mdr));
+}
+
+function businesscase(total){
+  const ekstraKlip = Math.max(0, S.plan.klip - S.nu.klip);
+  const omsKlip = ekstraKlip * S.behDag * 22 * S.bon;
+  const omsHs = S.plan.headspa > 0 ? S.hsUge * 4.33 * S.hsPris : 0;
+  const oms = omsKlip + omsHs;
+  const dbKr = oms * S.db/100;
+  const yd = ydelse(total, S.leasing);
+  return {ekstraKlip, omsKlip, omsHs, oms, dbKr, yd, netto: dbKr - yd,
+          maaneder: dbKr > 0 ? total/dbKr : null};
+}
+
+/* ---------- faglige indsigter ---------- */
+function indsigter(){
+  const s = S, P = s.plan, ude = [];
+  const har = (a,v) => a.indexOf(v) >= 0;
+  const add = o => ude.push(o);
+
+  if (har(s.symptomer,'farve') || P.klip >= 3 || s.niveau === 'premium'){
+    add({id:'lys', vaegt: har(s.symptomer,'farve') ? 'kritisk' : 'anbefalet',
+      titel:'Farven bliver bedømt i dit lys — ikke i producentens',
+      tekst:'Under CRI 90 forskubbes især kobber og røde nuancer, og kunden opdager det først i dagslys på vej hjem. En enkelt omfarvning koster typisk 60-90 minutter i stolen plus farven. Arbejdslys med CRI 95 er det billigste sted at fjerne den fejlkilde.',
+      kilde:'Belysning · Just Add People', tilvalg:'lys'});
+  }
+  if (har(s.symptomer,'luft') || P.farve > 0){
+    add({id:'udsugning', vaegt: har(s.symptomer,'luft') ? 'kritisk' : 'anbefalet',
+      titel:'Ved farvebaren fordamper kemien i din indåndingshøjde',
+      tekst:'Ammoniak og persulfater fra blegepulver stiger op fra skålen, præcis dér hvor du står bøjet over den. Punktudsugning trækker det væk ved kilden i stedet for at fortynde det i hele salonen — og det er den eneste løsning, der også virker for den, der står ved siden af.',
+      kilde:'Alsident-udsugning · Just Add People', tilvalg:'udsugning'});
+  }
+  if (har(s.symptomer,'ryg') || P.klip >= 3){
+    add({id:'ergonomi', vaegt: har(s.symptomer,'ryg') ? 'kritisk' : 'anbefalet',
+      titel:'Ryggen er den dyreste del af inventaret',
+      tekst:'En vaskeplads i forkert højde tvinger dig ud i den samme foroverbøjede stilling 20-30 gange om dagen. Sadelstol med hæve/sænk og en stol, der kan komme op i din højde frem for kundens, er den billigste forsikring mod en tidlig afsked med faget.',
+      kilde:'Ergonomi · Just Add People', tilvalg:'sadelstol'});
+  }
+  if (har(s.symptomer,'ryg')){
+    add({id:'maatte', vaegt:'anbefalet',
+      titel:'Du står syv timer på det samme kvadratmeter',
+      tekst:'Hårdt gulv giver belastning i knæ og lænd længe før ryggen protesterer. En ergonomisk måtte ved hver klippeplads koster under en enkelt farvebehandling og er det eneste greb, der virker hver eneste dag.',
+      kilde:'Ergonomi · Just Add People', tilvalg:'maatte'});
+  }
+  if (P.vask < Math.ceil(P.klip/2)){
+    add({id:'ratio', vaegt:'kritisk',
+      titel:'Køen opstår ved vasken, ikke ved stolen',
+      tekst:'Tommelfingerreglen er én vaskeplads pr. to klippepladser. Du har ' + P.klip + ' klippepladser og ' + P.vask + ' vaskeplads' + (P.vask === 1 ? '' : 'er') + '. Med den fordeling venter både kunde og kollega på det samme keramikhoved i de travleste to timer om dagen.',
+      kilde:'Salonflow · Just Add People', handling:{tekst:'Tilføj en vaskeplads', act:'addvask'}});
+  }
+  if (har(s.ambition,'kapacitet') || har(s.symptomer,'ko')){
+    add({id:'kapacitet', vaegt:'info',
+      titel:'En ekstra plads skal bruge under én kunde om ugen på at hvile i sig selv',
+      tekst:'Fuldt udstyret koster en klippeplads typisk 12.000-25.000 kr. På 36 måneders leasing er det 350-750 kr. om måneden. Med en gennemsnitsbon omkring 500 kr. ekskl. moms skal pladsen levere cirka én kunde om ugen, før den er betalt. Resten er dækningsbidrag.',
+      kilde:'Finansiering · Just Add People'});
+  }
+  if (har(s.symptomer,'lyd') || P.lounge > 0){
+    add({id:'akustik', vaegt: har(s.symptomer,'lyd') ? 'anbefalet' : 'info',
+      titel:'To føntørrere og hårde flader lander på 70-75 dB',
+      tekst:'Det er niveauet, hvor kunder holder op med at tale og medarbejdere bliver trætte før frokost. Loftet er den flade, ingen bruger til noget andet — akustikpaneler dér er det billigste greb, og det er samtidig det, kunderne beskriver som "rart" uden at kunne sige hvorfor.',
+      kilde:'Indretningshjælp · Just Add People', tilvalg:'akustik'});
+  }
+  if (har(s.symptomer,'slidt') || s.nu.alder === '11-15' || s.nu.alder === '16+'){
+    add({id:'slid', vaegt:'anbefalet',
+      titel:'Revner i betrækket er ikke kun kosmetik',
+      tekst:'Når polstringen krakelerer, kan overfladen ikke længere desinficeres forsvarligt — farve og blegemiddel trækker ned i sprækkerne. Samtidig er slidt inventar det første kunden lægger mærke til og det sidste, hun nævner. Regn med 8-12 år på en stol i daglig drift.',
+      kilde:'Tips og råd · Just Add People'});
+  }
+  if (P.headspa > 0 || har(s.ambition,'nyt')){
+    add({id:'headspa', vaegt:'info',
+      titel:'Head Spa er den samme kunde — men en anden forretning',
+      tekst:'En japansk Head Spa sælges typisk som 45-60 minutter til 650-900 kr. Den kræver en liggende vaskestol, damp og et hjørne med ro, men ikke en ny kundegruppe: den sælges bedst til dem, der allerede sidder i din stol. Behandlingen fylder de huller i kalenderen, klipningen ikke kan fylde.',
+      kilde:'Head Spa · Just Add People'});
+  }
+  if (har(s.symptomer,'plads')){
+    add({id:'plads', vaegt:'info',
+      titel:'Ledige kvadratmeter koster husleje hver eneste måned',
+      tekst:'En tom krog er den dyreste kvadratmeter i salonen, fordi den betaler husleje uden at levere omsætning. En udlejet stol i et salonfællesskab, en behandlingsplads eller en Head Spa-niche gør den til indtægt — uden at du skal ansætte nogen.',
+      kilde:'Opstart og drift · Just Add People'});
+  }
+  add({id:'montering', vaegt:'info',
+    titel:'Det tunge arbejde ligger i dagen, hvor salonen er lukket',
+    tekst:'Vaskeunits skal tilsluttes, stole skal samles, og det gamle inventar skal ud. Lægges leveringen på en enkelt lukkedag, mister du én dags omsætning i stedet for en uges rod. Bortkørsel af det gamle er en del af opgaven, ikke et efterspil.',
+    kilde:'Levering · Just Add People', tilvalg:'montering'});
+
+  const rang = {kritisk:0, anbefalet:1, info:2};
+  return ude.sort((a,b) => rang[a.vaegt] - rang[b.vaegt]);
+}
+
+function synkTilvalg(){
+  const aktive = indsigter();
+  const gyldige = {};
+  aktive.forEach(i => { if (i.tilvalg) gyldige[i.tilvalg] = i.vaegt !== 'info'; });
+  TILVALG.forEach(t => {
+    if (!(t.id in gyldige)) { delete S.tilvalg[t.id]; return; }
+    if (!S.rort[t.id]) S.tilvalg[t.id] = gyldige[t.id];
+  });
+}
+
+/* ---------- byggeklodser ---------- */
+const opt = (act, val, on, titel, desc, sq) =>
+  '<button class="opt' + (sq ? ' sq' : '') + '" data-act="' + act + '" data-val="' + val + '" aria-pressed="' + on + '">' +
+  '<span class="tick"></span><span><strong>' + titel + '</strong>' + (desc ? '<small>' + desc + '</small>' : '') + '</span></button>';
+
+const tal = (act, key, v, navn, desc, min, max) =>
+  '<div class="row"><div class="txt"><strong>' + navn + '</strong><small>' + desc + '</small></div>' +
+  '<div class="stepper">' +
+  '<button data-act="' + act + '" data-val="' + key + ':-1" aria-label="Færre ' + navn.toLowerCase() + '"' + (v <= min ? ' disabled' : '') + '>&minus;</button>' +
+  '<output>' + v + '</output>' +
+  '<button data-act="' + act + '" data-val="' + key + ':1" aria-label="Flere ' + navn.toLowerCase() + '"' + (v >= max ? ' disabled' : '') + '>+</button>' +
+  '</div></div>';
+
+const nav = (tilbage, label, act, deaktiv) =>
+  '<div class="actions">' +
+  (tilbage ? '<button class="btn ghost" data-act="tilbage">Tilbage</button>' : '') +
+  '<button class="btn primary" data-act="' + act + '"' + (deaktiv ? ' disabled' : '') + '>' + label + '</button>' +
+  '</div>';
+
+const head = (nr, titel, lede) =>
+  '<div class="eyebrow">' + nr + '</div><h2>' + titel + '</h2><p class="lede">' + lede + '</p>';
+
+/* ---------- trinnene ---------- */
+function trinNu(){
+  const a = [['0-5','0-5 år'],['6-10','6-10 år'],['11-15','11-15 år'],['16+','Over 15 år, eller overtaget med lokalet']];
+  return head('Trin 1 · Din salon i dag',
+    'Lad os starte med den salon, du står i.',
+    'Fire hurtige oplysninger. De afgør, hvad du får ud af resten — og hvad vi kan regne på til sidst.') +
+    '<section><h3>Pladser i dag</h3><div class="rows">' +
+      tal('nu','klip', S.nu.klip, 'Klippepladser', 'Betjente pladser med stol og spejl', 1, 12) +
+      tal('nu','vask', S.nu.vask, 'Vaskepladser', 'Keramikhoveder i drift', 0, 8) +
+    '</div></section>' +
+    '<section><h3>Hvor gammelt er inventaret?</h3><div class="opts par">' +
+      a.map(x => opt('alder', x[0], S.nu.alder === x[0], x[1], '')).join('') +
+    '</div></section>' +
+    nav(false, 'Videre', 'frem');
+}
+
+function trinSymptomer(){
+  const liste = [
+    ['ryg','Ryg, nakke eller skuldre gør ondt','Efter en lang dag — eller allerede ved frokost.'],
+    ['ko','Kunderne venter for længe','Der opstår kø ved vasken eller i receptionen på de travle dage.'],
+    ['farve','Farven ser anderledes ud udenfor','Kunden ringer dagen efter, fordi resultatet ikke holdt i dagslys.'],
+    ['luft','Der lugter af kemi','Særligt omkring farvebaren — og det hænger i tøjet.'],
+    ['lyd','Der er larmende','Man skal hæve stemmen for at tale med kunden i stolen.'],
+    ['slidt','Salonen trænger visuelt','Betræk, spejle eller belysning er ikke, som da I åbnede.'],
+    ['plads','Jeg har plads til overs','Et hjørne eller et lokale, der ikke bidrager med noget.']
+  ];
+  return head('Trin 2 · Hverdagen',
+    'Hvad mærker du, når du lukker om lørdagen?',
+    'Vælg det, du genkender. Det er her, vi finder ud af, hvad der reelt skal løses — ikke bare hvad der skal købes.') +
+    '<section><h3>Vælg alt, der passer</h3><div class="opts">' +
+      liste.map(x => opt('sym', x[0], S.symptomer.indexOf(x[0]) >= 0, x[1], x[2], true)).join('') +
+    '</div></section>' +
+    nav(true, 'Videre', 'frem');
+}
+
+function trinAmbition(){
+  const liste = [
+    ['kapacitet','Mere kapacitet','Jeg vil kunne tage flere kunder ind uden at flytte eller bygge om.'],
+    ['arbejdsmiljo','Bedre arbejdsmiljø','Jeg og mit team skal kunne holde til faget om ti år.'],
+    ['oplevelse','Løfte oplevelsen','Kunden skal kunne mærke forskel på min salon og den nede ad gaden.'],
+    ['nyt','Et nyt indtægtsben','Head Spa eller behandlinger, jeg kan sælge til de kunder, jeg allerede har.']
+  ];
+  return head('Trin 3 · Ambition',
+    'Hvad skal investeringen først og fremmest give dig?',
+    'Vælg gerne to. Det styrer både hvilke pladser vi foreslår, og hvilke tal vi regner på til sidst.') +
+    '<section><h3>Vælg det vigtigste</h3><div class="opts">' +
+      liste.map(x => opt('amb', x[0], S.ambition.indexOf(x[0]) >= 0, x[1], x[2], true)).join('') +
+    '</div></section>' +
+    nav(true, 'Videre', 'frem');
+}
+
+function trinPlan(){
+  const P = S.plan;
+  return head('Trin 4 · Byg salonen',
+    'Sæt pladserne, som du gerne vil have dem.',
+    'Tænk i pladser frem for i møbler — vi sætter selv rullebord, spejl og fodstøtte på hver plads, så der ikke mangler noget på leveringsdagen.') +
+    '<section><h3>Pladser i den nye salon</h3><div class="rows">' +
+      tal('plan','klip', P.klip, 'Klippepladser', 'Stol, spejlkonsol, rullebord og fodstøtte pr. plads', 1, 14) +
+      tal('plan','vask', P.vask, 'Vaskepladser', 'Vaskeunit med keramikvask og sadelstol', 0, 8) +
+      tal('plan','farve', P.farve, 'Farvebar', 'Arbejdsplads til blanding, med farvevogn', 0, 3) +
+      tal('plan','lounge', P.lounge, 'Loungepladser', 'Siddepladser til venteområdet', 0, 10) +
+      tal('plan','reception', P.reception, 'Reception', 'Disk med opbevaring og stol', 0, 2) +
+      tal('plan','headspa', P.headspa, 'Head Spa-plads', 'Liggende vaskestol, behandlerstol og damp', 0, 4) +
+    '</div></section>' +
+    '<section><h3>Kvalitetsniveau</h3><div class="opts">' +
+      NIVEAUER.map(n => opt('niveau', n.id, S.niveau === n.id, n.navn, n.desc)).join('') +
+    '</div></section>' +
+    '<section><h3>Stilretning</h3><div class="opts two">' +
+      STILARTER.map(n => opt('stil', n.id, S.stil === n.id, n.navn, n.desc)).join('') +
+    '</div></section>' +
+    nav(true, 'Se hvad vi lægger mærke til', 'frem');
+}
+
+function trinIndsigter(){
+  const list = indsigter();
+  const kort = list.map(i => {
+    const t = i.tilvalg ? TILVALG.find(x => x.id === i.tilvalg) : null;
+    const stk = t ? antal(t.per) : 0;
+    return '<div class="insight ' + i.vaegt + '">' +
+      '<div class="insight-top"><span class="tag ' + i.vaegt + '">' +
+        (i.vaegt === 'kritisk' ? 'Vigtigst' : i.vaegt === 'anbefalet' ? 'Anbefalet' : 'Godt at vide') +
+      '</span><span class="src">' + i.kilde + '</span></div>' +
+      '<h4>' + i.titel + '</h4><p>' + i.tekst + '</p>' +
+      (t && stk > 0 ?
+        '<div class="addon"><span class="lbl">' + t.navn + '<small>' + stk + ' stk. · ' + t.enhed + '</small></span>' +
+        '<button class="toggle" data-act="tilvalg" data-val="' + t.id + '" aria-pressed="' + (!!S.tilvalg[t.id]) + '">' +
+        '<span class="dot"></span>' + (S.tilvalg[t.id] ? 'Med i pakken' : 'Tilføj til pakken') + '</button></div>' : '') +
+      (i.handling ?
+        '<div class="addon"><span class="lbl">Ret det med det samme<small>Vi justerer din plan</small></span>' +
+        '<button class="toggle" data-act="' + i.handling.act + '"><span class="dot"></span>' + i.handling.tekst + '</button></div>' : '') +
+    '</div>';
+  }).join('');
+
+  return head('Trin 5 · Faglige indsigter',
+    'Det her ville vi sige, hvis vi stod i salonen.',
+    'Baseret på dine svar. Til- og fravælg frit — det, du lader stå, følger med i pakken på næste side.') +
+    '<section><h3>' + list.length + ' indsigter til din salon</h3><div class="opts">' + kort + '</div></section>' +
+    nav(true, 'Vis pakke og pris', 'frem');
+}
+
+function pakkenavn(){
+  const n = NIVEAUER.find(x => x.id === S.niveau).navn;
+  const a = S.plan.headspa > 0 ? 'Head Spa-udvidelse'
+    : S.plan.klip > S.nu.klip ? 'Kapacitetsløft'
+    : S.symptomer.indexOf('ryg') >= 0 || S.ambition.indexOf('arbejdsmiljo') >= 0 ? 'Arbejdsmiljøløft'
+    : 'Salonløft';
+  return a + ' · ' + n;
+}
+
+function trinPris(){
+  const b = beregn(), c = businesscase(b.pris);
+  const P = S.plan;
+  const rk = [];
+  b.grupper.forEach(g => {
+    rk.push('<tr class="grp"><td colspan="4">' + g.navn + '</td></tr>');
+    g.linjer.forEach(l => rk.push('<tr><td>' + l.navn + '</td><td class="n">' + l.stk + '</td>' +
+      '<td class="n was">' + kr(l.sumVejl) + '</td><td class="n">' + kr(l.sumPris) + '</td></tr>'));
+  });
+  rk.push('<tr class="sum"><td>Din pakke, ' + b.stk + ' dele</td><td class="n"></td>' +
+    '<td class="n was">' + kr(b.vejl) + '</td><td class="n">' + kr(b.pris) + '</td></tr>');
+
+  const dele = [];
+  if (P.klip) dele.push(pl(P.klip, 'klippeplads', 'klippepladser'));
+  if (P.vask) dele.push(pl(P.vask, 'vaskeplads', 'vaskepladser'));
+  if (P.farve) dele.push(pl(P.farve, 'farvebar', 'farvebarer'));
+  if (P.headspa) dele.push(pl(P.headspa, 'Head Spa-plads', 'Head Spa-pladser'));
+
+  return head('Trin 6 · Pakke og pris',
+    pakkenavn(),
+    'Sådan ser din salon ud, når alt er talt med. Alle priser er ekskl. moms — og som altid ser du både den vejledende pris og vores.') +
+
+    '<section><div class="pricehead">' +
+      '<div><div class="pkg">' + dele.join(' · ') + '</div>' +
+      '<p class="sub">' + STILARTER.find(s => s.id === S.stil).navn + ' · ' +
+        NIVEAUER.find(n => n.id === S.niveau).navn + ' · ' + b.stk + ' dele i alt</p></div>' +
+      '<dl class="figs">' +
+        '<div class="fig hero"><dt>Din pris</dt><dd id="figPris">' + kr(b.pris) + '</dd><small>ekskl. moms</small></div>' +
+        '<div class="fig"><dt>Vejledende</dt><dd>' + kr(b.vejl) + '</dd><small>listepris</small></div>' +
+        '<div class="fig save"><dt>Du sparer</dt><dd>' + kr(b.spar) + '</dd><small>' + Math.round(b.spar/b.vejl*100) + ' % under vejledende</small></div>' +
+        '<div class="fig"><dt>Leasing</dt><dd id="figYd">' + kr(c.yd) + '</dd><small>pr. måned i ' + S.leasing + ' mdr.</small></div>' +
+      '</dl>' +
+    '</div></section>' +
+
+    '<section><h3>Løbetid</h3>' +
+      '<div class="seg">' + [12,24,36,48].map(m =>
+        '<button data-act="leasing" data-val="' + m + '" aria-pressed="' + (S.leasing === m) + '">' + m + ' mdr.</button>').join('') + '</div>' +
+      '<p class="lede" style="font-size:14px; margin-top:12px">Restværdi 100 kr., så der ikke venter en stor slutbetaling. ' +
+      'Finansiering forudsætter en positiv kreditgodkendelse. Beregningen er vejledende.</p></section>' +
+
+    '<section><h3>Regner det hjem?</h3><div class="case">' +
+      '<h4>Din business case</h4>' +
+      '<div class="slider"><div class="top"><label for="sBon">Gennemsnitlig behandling, ekskl. moms</label><output id="outBon">' + kr(S.bon) + '</output></div>' +
+        '<input type="range" id="sBon" data-slider="bon" min="250" max="1200" step="10" value="' + S.bon + '"></div>' +
+      '<div class="slider"><div class="top"><label for="sBeh">Bookede behandlinger pr. dag på den nye plads</label><output id="outBeh">' + S.behDag + '</output></div>' +
+        '<input type="range" id="sBeh" data-slider="behDag" min="2" max="10" step="1" value="' + S.behDag + '"></div>' +
+      '<div class="slider"><div class="top"><label for="sDb">Dækningsbidrag efter produkter og løn</label><output id="outDb">' + S.db + ' %</output></div>' +
+        '<input type="range" id="sDb" data-slider="db" min="15" max="70" step="5" value="' + S.db + '"></div>' +
+      (P.headspa > 0 ?
+      '<div class="slider"><div class="top"><label for="sHs">Head Spa-behandlinger pr. uge</label><output id="outHs">' + S.hsUge + '</output></div>' +
+        '<input type="range" id="sHs" data-slider="hsUge" min="0" max="25" step="1" value="' + S.hsUge + '"></div>' : '') +
+      '<p class="verdict" id="caseTekst">' + caseTekst(b, c) + '</p>' +
+    '</div></section>' +
+
+    '<section><h3>Din stykliste</h3><div class="scroll"><table class="lines">' +
+      '<thead><tr><th>Vare</th><th class="n">Stk.</th><th class="n">Vejledende</th><th class="n">Din pris</th></tr></thead>' +
+      '<tbody>' + rk.join('') + '</tbody></table></div>' +
+      '<p class="lede" style="font-size:13.5px; margin-top:12px">Produktnavne og priser er eksempeldata til denne prototype.</p></section>' +
+
+    nav(true, 'Få pakken som rapport', 'frem');
+}
+
+function caseTekst(b, c){
+  if (c.oms <= 0){
+    return 'Du bygger ikke ekstra kapacitet ind i denne pakke — investeringen skal hentes på arbejdsmiljø, ' +
+      'færre fejlbehandlinger og en salon, kunderne bliver længere i. Vil du se tallene for en ekstra plads, ' +
+      'så gå tilbage og læg én til.';
+  }
+  const dele = [];
+  if (c.omsKlip > 0) dele.push(c.ekstraKlip + ' ekstra klippeplads' + (c.ekstraKlip === 1 ? '' : 'er') + ' giver ' + kr(c.omsKlip) + ' i ekstra omsætning om måneden');
+  if (c.omsHs > 0) dele.push('Head Spa lægger ' + kr(c.omsHs) + ' oveni');
+  const netto = c.netto >= 0
+    ? 'Det er <b>' + kr(c.netto) + ' mere om måneden</b>, end leasingydelsen koster dig — fra den første måned.'
+    : 'Det dækker ikke helt ydelsen på ' + kr(c.yd) + '. Der mangler <b>' + kr(-c.netto) + ' om måneden</b> — prøv en længere løbetid, eller regn med lidt flere behandlinger.';
+  const pb = c.maaneder ? ' Hele pakken er tjent hjem på cirka <b>' + Math.ceil(c.maaneder) + ' måneder</b> — alene på den ekstra kapacitet, og kun hvis den bliver booket som sat ovenfor.' : '';
+  return dele.join('. ') + '. Med ' + S.db + ' % i dækningsbidrag bliver det ' + kr(c.dbKr) + ' om måneden til dig. ' + netto + pb;
+}
+
+function trinLead(){
+  const L = S.lead;
+  const felt = (k, label, type, ph, hint) =>
+    '<div class="field"><label for="f_' + k + '">' + label + '</label>' +
+    '<input id="f_' + k + '" type="' + type + '" data-felt="' + k + '" value="' + esc(L[k]) + '" placeholder="' + ph + '">' +
+    (hint ? '<span class="hint">' + hint + '</span>' : '') + '</div>';
+  const klar = L.navn.trim().length > 1 && /.+@.+\..+/.test(L.email);
+
+  return head('Sidste skridt',
+    'Hvor skal rapporten sendes hen?',
+    'Du får hele oplægget som ét dokument: din plan, indsigterne, styklisten, prisen og finansieringen — så du kan tage det med til revisoren, kompagnonen eller banken.') +
+    '<section><h3>Dine oplysninger</h3><form class="lead" autocomplete="on">' +
+      '<div class="grid2">' + felt('navn','Navn','text','Dit navn') + felt('salon','Salonens navn','text','Fx Salon Nord') + '</div>' +
+      '<div class="grid2">' + felt('email','E-mail','email','dig@dinsalon.dk') + felt('tlf','Telefon','tel','') + '</div>' +
+      '<div class="grid2">' + felt('post','Postnummer','text','8800') +
+        '<div class="field"><label for="f_hor">Hvornår skal det ske?</label><select id="f_hor" data-felt="horisont">' +
+          [['0-3','Inden for 3 måneder'],['3-6','Om 3-6 måneder'],['6-12','Om 6-12 måneder'],['ved','Jeg undersøger mulighederne']]
+            .map(o => '<option value="' + o[0] + '"' + (L.horisont === o[0] ? ' selected' : '') + '>' + o[1] + '</option>').join('') +
+        '</select></div>' +
+      '</div>' +
+      '<label class="consent"><input type="checkbox" checked disabled>' +
+        'Ja tak — I må gerne kontakte mig om oplægget og tilbyde en gratis fremvisning i min salon.</label>' +
+    '</form>' +
+    '<div class="callout" style="margin-top:18px"><b>Prototype:</b> oplysningerne bliver ikke gemt og ikke sendt nogen steder. ' +
+      'De bruges udelukkende til at sætte dit navn på rapporten her i browseren.</div>' +
+    '</section>' +
+    nav(true, 'Byg min rapport', 'send', !klar);
+}
+
+function trinRapport(){
+  return head('Din rapport er klar',
+    'Salonrapport til ' + (S.lead.salon.trim() || S.lead.navn.trim() || 'din salon'),
+    'Hele oplægget samlet ét sted. Hent det som fil, eller print det direkte — og tag de næste skridt, når du er klar.') +
+    '<div class="actions no-print" style="margin-top:24px">' +
+      '<button class="btn primary" data-act="hent">Hent rapporten</button>' +
+      '<button class="btn ghost" data-act="print">Print eller gem som PDF</button>' +
+      '<button class="btn ghost" data-act="omfra">Start forfra</button>' +
+    '</div><p class="status no-print" id="dlStatus"></p>' +
+    '<section><div class="report">' + rapportKrop() + '</div></section>' +
+    '<section class="no-print"><h3>Næste skridt</h3><div class="next">' +
+      '<div class="nextcard"><b>Gratis fremvisning i din salon</b><small>Vi kører ud med stolene, så du kan prøve dem i dit eget lys og din egen plads, inden du beslutter dig.</small><span class="go">Book en dato →</span></div>' +
+      '<div class="nextcard"><b>Besøg showroomet i Viborg</b><small>Mariendalsvej 32. Hverdage 9-16 med personlig rundvisning. Det er gratis at kigge.</small><span class="go">Book rundvisning →</span></div>' +
+      '<div class="nextcard"><b>Søg finansiering</b><small>Leasing fra 12 til 48 måneder med 100 kr. i restværdi. Svar på kreditgodkendelsen samme dag.</small><span class="go">Se mulighederne →</span></div>' +
+    '</div></section>';
+}
+
+/* ---------- rapportens indhold ---------- */
+function rapportKrop(){
+  const b = beregn(), c = businesscase(b.pris), P = S.plan;
+  const dato = new Date().toLocaleDateString('da-DK', {day:'numeric', month:'long', year:'numeric'});
+  const symTekst = {ryg:'fysisk belastning', ko:'kø og ventetid', farve:'farveresultat i salonens lys',
+    luft:'kemi og lugt', lyd:'støjniveau', slidt:'slidt inventar', plads:'uudnyttet plads'};
+  const ambTekst = {kapacitet:'mere kapacitet', arbejdsmiljo:'bedre arbejdsmiljø',
+    oplevelse:'løft af kundeoplevelsen', nyt:'nyt indtægtsben'};
+
+  const rk = [];
+  b.grupper.forEach(g => {
+    rk.push('<tr class="grp"><td colspan="4">' + g.navn + '</td></tr>');
+    g.linjer.forEach(l => rk.push('<tr><td>' + l.navn + '</td><td class="n">' + l.stk + '</td>' +
+      '<td class="n was">' + kr(l.sumVejl) + '</td><td class="n">' + kr(l.sumPris) + '</td></tr>'));
+  });
+  rk.push('<tr class="sum"><td>I alt, ' + b.stk + ' dele</td><td class="n"></td><td class="n was">' +
+    kr(b.vejl) + '</td><td class="n">' + kr(b.pris) + '</td></tr>');
+
+  const ind = indsigter().map(i =>
+    '<div class="insight ' + i.vaegt + '"><div class="insight-top"><span class="tag ' + i.vaegt + '">' +
+    (i.vaegt === 'kritisk' ? 'Vigtigst' : i.vaegt === 'anbefalet' ? 'Anbefalet' : 'Godt at vide') +
+    '</span></div><h4>' + i.titel + '</h4><p>' + i.tekst + '</p></div>').join('');
+
+  return '' +
+  '<div><h3>Rapport</h3>' +
+    '<h2 style="font-family:var(--serif); font-size:30px; line-height:1.15">' + esc(pakkenavn()) + '</h2>' +
+    '<p class="lede">Udarbejdet til ' + esc(S.lead.salon.trim() || 'din salon') +
+    (S.lead.navn.trim() ? ' ved ' + esc(S.lead.navn.trim()) : '') + ' · ' + dato + '</p></div>' +
+
+  '<div><h3>Udgangspunkt</h3><dl class="spec" style="padding:0">' +
+    '<div><dt>Salonen i dag</dt><dd>' + pl(S.nu.klip, 'klippeplads', 'klippepladser') + ', ' + pl(S.nu.vask, 'vaskeplads', 'vaskepladser') + '</dd></div>' +
+    '<div><dt>Inventarets alder</dt><dd>' + S.nu.alder.replace('+',' +') + ' år</dd></div>' +
+    '<div><dt>Det, der presser</dt><dd>' + (S.symptomer.map(s => symTekst[s]).join(', ') || 'ikke angivet') + '</dd></div>' +
+    '<div><dt>Ambition</dt><dd>' + (S.ambition.map(a => ambTekst[a]).join(', ') || 'ikke angivet') + '</dd></div>' +
+    '<div><dt>Tidshorisont</dt><dd>' + ({'0-3':'inden for 3 måneder','3-6':'om 3-6 måneder','6-12':'om 6-12 måneder','ved':'undersøger'})[S.lead.horisont] + '</dd></div>' +
+  '</dl></div>' +
+
+  '<div><h3>Den nye salon</h3><dl class="spec" style="padding:0">' +
+    '<div><dt>Klippepladser</dt><dd>' + P.klip + '</dd></div>' +
+    '<div><dt>Vaskepladser</dt><dd>' + P.vask + '</dd></div>' +
+    '<div><dt>Farvebar</dt><dd>' + (P.farve || '—') + '</dd></div>' +
+    '<div><dt>Loungepladser</dt><dd>' + (P.lounge || '—') + '</dd></div>' +
+    '<div><dt>Reception</dt><dd>' + (P.reception || '—') + '</dd></div>' +
+    '<div><dt>Head Spa-pladser</dt><dd>' + (P.headspa || '—') + '</dd></div>' +
+    '<div><dt>Niveau og stil</dt><dd>' + NIVEAUER.find(n => n.id === S.niveau).navn + ' · ' + STILARTER.find(s => s.id === S.stil).navn + '</dd></div>' +
+  '</dl></div>' +
+
+  '<div><h3>Faglige indsigter</h3><div class="opts">' + ind + '</div></div>' +
+
+  '<div><h3>Pakke og pris</h3><div class="scroll"><table class="lines">' +
+    '<thead><tr><th>Vare</th><th class="n">Stk.</th><th class="n">Vejledende</th><th class="n">Din pris</th></tr></thead>' +
+    '<tbody>' + rk.join('') + '</tbody></table></div></div>' +
+
+  '<div><h3>Økonomi</h3><dl class="figs">' +
+    '<div class="fig hero"><dt>Din pris</dt><dd>' + kr(b.pris) + '</dd><small>ekskl. moms</small></div>' +
+    '<div class="fig save"><dt>Under vejledende</dt><dd>' + kr(b.spar) + '</dd><small>' + Math.round(b.spar/b.vejl*100) + ' %</small></div>' +
+    '<div class="fig"><dt>Leasing</dt><dd>' + kr(c.yd) + '</dd><small>pr. md. i ' + S.leasing + ' mdr.</small></div>' +
+    (c.dbKr > 0 ? '<div class="fig"><dt>Ekstra dækningsbidrag</dt><dd>' + kr(c.dbKr) + '</dd><small>pr. måned</small></div>' : '') +
+  '</dl><p class="verdict" style="margin-top:14px">' + caseTekst(b, c) + '</p></div>' +
+
+  '<div><h3>Næste skridt</h3><ul style="margin:0; padding-left:20px; color:var(--ink-2); line-height:1.8">' +
+    '<li>Book en gratis fremvisning — vi kører ud med stolene, så de kan prøves i din egen salon.</li>' +
+    '<li>Besøg showroomet på Mariendalsvej 32, 8800 Viborg. Hverdage 9-16, personlig rundvisning.</li>' +
+    '<li>Søg finansiering: 12-48 måneder, 100 kr. i restværdi, svar på kreditgodkendelse samme dag.</li>' +
+  '</ul></div>' +
+
+  '<div class="callout"><b>Om tallene:</b> Denne rapport er lavet i en prototype. Produktnavne og priser er eksempeldata, ' +
+    'og beregningen af leasing og business case er vejledende — ikke et tilbud. Alle beløb er ekskl. moms. ' +
+    'Beregningen forudsætter 22 åbningsdage om måneden og ' + S.db + ' % dækningsbidrag efter produkter og løn.</div>';
+}
+
+function rapportFil(){
+  const titel = 'Salonrapport · ' + (S.lead.salon.trim() || 'Din salon');
+  const css = document.querySelector('style').textContent;
+  return '<!doctype html><html lang="da"><head><meta charset="utf-8">' +
+    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
+    '<title>' + esc(titel) + '</title>' +
+    '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500&family=IBM+Plex+Mono:wght@400;500&display=swap">' +
+    '<style>' + css + '\nbody{padding:40px 24px}\n.wrap{max-width:820px}\n</style></head><body>' +
+    '<div class="wrap"><div class="report">' + rapportKrop() + '</div>' +
+    '<p class="lede" style="font-size:12.5px; margin-top:28px">Salonbyggeren · prototype · ' +
+    new Date().toLocaleDateString('da-DK') + '</p></div></body></html>';
+}
+
+async function hentRapport(){
+  const st = document.getElementById('dlStatus');
+  const navn = 'salonrapport-' + (S.lead.salon.trim() || S.lead.navn.trim() || 'salon')
+    .toLowerCase().replace(/[^a-z0-9æøå]+/g, '-').replace(/^-|-$/g, '') + '.html';
+  st.className = 'status no-print'; st.textContent = 'Klargør rapporten…';
+  const fil = rapportFil();
+  try {
+    const dl = (window.claude && window.claude.use) ? await window.claude.use('downloads') : null;
+    if (dl){
+      await dl.save({filename: navn, data: fil});
+      st.className = 'status ok no-print';
+      st.textContent = 'Rapporten er hentet som ' + navn;
+      return;
+    }
+    const url = URL.createObjectURL(new Blob([fil], {type:'text/html'}));
+    const a = document.createElement('a');
+    a.href = url; a.download = navn; document.body.appendChild(a); a.click(); a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 4000);
+    st.className = 'status ok no-print';
+    st.textContent = 'Rapporten er hentet som ' + navn + '.';
+  } catch (e){
+    const kode = e && e.code ? e.code : 'ukendt';
+    st.className = 'status err no-print';
+    st.textContent = kode === 'declined'
+      ? 'Download afbrudt. Prøv igen, eller brug "Print eller gem som PDF".'
+      : 'Kunne ikke hente filen her (' + kode + '). Brug "Print eller gem som PDF" i stedet.';
+  }
+}
+
+/* ---------- sidepanel ---------- */
+function railHTML(){
+  const raekke = (t, v, dim) => '<div' + (dim ? ' class="muted"' : '') + '><dt>' + t + '</dt><dd>' + v + '</dd></div>';
+  let r = '';
+  if (S.step < 3){
+    r += raekke('Klippepladser i dag', S.nu.klip);
+    r += raekke('Vaskepladser i dag', S.nu.vask);
+    r += raekke('Inventarets alder', S.nu.alder === '16+' ? '15+ år' : S.nu.alder + ' år');
+    r += raekke('Det, der presser', S.symptomer.length ? S.symptomer.length + ' punkter' : '—', !S.symptomer.length);
+    r += raekke('Ambition', S.ambition.length ? S.ambition.length + ' valgt' : '—', !S.ambition.length);
+  } else {
+    const P = S.plan, d = P.klip - S.nu.klip;
+    r += raekke('Klippepladser', P.klip + (d > 0 ? ' <i>+' + d + '</i>' : ''));
+    r += raekke('Vaskepladser', P.vask);
+    r += raekke('Farvebar', P.farve || '—', !P.farve);
+    r += raekke('Loungepladser', P.lounge || '—', !P.lounge);
+    r += raekke('Reception', P.reception || '—', !P.reception);
+    r += raekke('Head Spa', P.headspa || '—', !P.headspa);
+    r += raekke('Niveau', NIVEAUER.find(n => n.id === S.niveau).navn);
+    r += raekke('Stil', STILARTER.find(s => s.id === S.stil).navn);
+  }
+  if (S.step >= 4){
+    const valgt = TILVALG.filter(t => S.tilvalg[t.id]).length;
+    r += raekke('Indsigter', indsigter().length);
+    r += raekke('Tilvalg med i pakken', valgt || '—', !valgt);
+  }
+  let note = '<div class="rail-note"><b>Til sidst</b><span>Pris og pakke vises, når salonen står rigtigt. Først formen — så tallene.</span></div>';
+  if (S.step >= 5){
+    const b = beregn(), c = businesscase(b.pris);
+    r += raekke('Dele i alt', b.stk);
+    r += '<div><dt style="font-weight:600; color:var(--ink)">Din pris</dt><dd style="font-weight:600">' + kr(b.pris) + '</dd></div>';
+    r += raekke('Leasing, ' + S.leasing + ' mdr.', kr(c.yd));
+    note = '<div class="rail-note"><b>Ærlig pris</b><span>Du ser altid både den vejledende pris og vores. Alle beløb er ekskl. moms.</span></div>';
+  }
+  return '<div class="card"><div class="rail-head"><h4>Din salon</h4><span>' +
+    (S.step >= 5 ? 'Samlet' : 'Tager form') + '</span></div><dl class="spec">' + r + '</dl>' + note + '</div>';
+}
+
+/* ---------- render ---------- */
+function render(){
+  const stage = document.getElementById('stage');
+  const visning = [trinNu, trinSymptomer, trinAmbition, trinPlan, trinIndsigter, trinPris, trinLead, trinRapport][S.step];
+  stage.innerHTML = visning();
+  const rail = document.getElementById('rail');
+  rail.innerHTML = S.step >= 7 ? '' : railHTML();
+  rail.hidden = S.step >= 7;
+  document.querySelector('.bench').classList.toggle('solo', S.step >= 7);
+
+  const dots = TRIN.map((t, i) =>
+    '<li class="' + (i < S.step ? 'done' : i === S.step ? 'now' : '') + '" title="' + t.navn + '"></li>').join('');
+  document.getElementById('stepDots').innerHTML = dots;
+  document.getElementById('stepLabel').textContent =
+    S.step <= 5 ? 'Trin ' + (S.step+1) + ' af 6 · ' + TRIN[S.step].navn
+    : S.step === 6 ? 'Kontaktoplysninger' : 'Rapport';
+  window.scrollTo({top:0, behavior:'instant'});
+}
+
+function initPlan(){
+  if (S.planInit) return;
+  S.planInit = true;
+  const vil = S.ambition.indexOf('kapacitet') >= 0 || S.symptomer.indexOf('ko') >= 0;
+  S.plan.klip = Math.min(14, S.nu.klip + (vil ? 1 : 0));
+  S.plan.vask = S.nu.vask;
+  S.plan.farve = 1;
+  S.plan.lounge = Math.max(2, S.nu.klip);
+  S.plan.reception = 1;
+  S.plan.headspa = S.ambition.indexOf('nyt') >= 0 ? 1 : 0;
+}
+
+function skift(n){
+  S.step = n;
+  if (S.step >= 3) initPlan();
+  if (S.step >= 4) synkTilvalg();
+  render();
+}
+
+/* ---------- hændelser ---------- */
+document.addEventListener('click', ev => {
+  const el = ev.target.closest('[data-act]');
+  if (!el) return;
+  const act = el.dataset.act, val = el.dataset.val;
+
+  if (act === 'frem'){ skift(S.step + 1); return; }
+  if (act === 'tilbage'){ skift(Math.max(0, S.step - 1)); return; }
+  if (act === 'send'){ S.sendt = true; skift(7); return; }
+  if (act === 'hent'){ hentRapport(); return; }
+  if (act === 'print'){ window.print(); return; }
+  if (act === 'omfra'){
+    S.step = 0; S.planInit = false; S.sendt = false;
+    S.tilvalg = {}; S.rort = {};
+    S.lead = {navn:'', salon:'', email:'', tlf:'', post:'', horisont:'3-6'};
+    render(); return;
+  }
+  if (act === 'nu' || act === 'plan'){
+    const d = val.split(':'), key = d[0], delta = parseInt(d[1], 10);
+    const maal = act === 'nu' ? S.nu : S.plan;
+    const graenser = {klip:[act === 'nu' ? 1 : 1, act === 'nu' ? 12 : 14], vask:[0,8], farve:[0,3],
+      lounge:[0,10], reception:[0,2], headspa:[0,4]};
+    const g = graenser[key];
+    maal[key] = Math.max(g[0], Math.min(g[1], maal[key] + delta));
+    if (S.step >= 4) synkTilvalg();
+    render(); return;
+  }
+  if (act === 'alder'){ S.nu.alder = val; render(); return; }
+  if (act === 'niveau'){ S.niveau = val; render(); return; }
+  if (act === 'stil'){ S.stil = val; render(); return; }
+  if (act === 'sym' || act === 'amb'){
+    const arr = act === 'sym' ? S.symptomer : S.ambition;
+    const i = arr.indexOf(val);
+    if (i >= 0) arr.splice(i, 1); else arr.push(val);
+    render(); return;
+  }
+  if (act === 'tilvalg'){
+    S.tilvalg[val] = !S.tilvalg[val];
+    S.rort[val] = true;
+    render(); return;
+  }
+  if (act === 'addvask'){
+    S.plan.vask = Math.min(8, S.plan.vask + 1);
+    synkTilvalg(); render(); return;
+  }
+  if (act === 'leasing'){ S.leasing = parseInt(val, 10); render(); return; }
+});
+
+document.addEventListener('input', ev => {
+  const s = ev.target.closest('[data-slider]');
+  if (s){
+    S[s.dataset.slider] = parseInt(s.value, 10);
+    const b = beregn(), c = businesscase(b.pris);
+    const sæt = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    sæt('outBon', kr(S.bon)); sæt('outBeh', S.behDag); sæt('outDb', S.db + ' %'); sæt('outHs', S.hsUge);
+    const t = document.getElementById('caseTekst');
+    if (t) t.innerHTML = caseTekst(b, c);
+    return;
+  }
+  const f = ev.target.closest('[data-felt]');
+  if (f){
+    S.lead[f.dataset.felt] = f.value;
+    const knap = document.querySelector('[data-act="send"]');
+    if (knap) knap.disabled = !(S.lead.navn.trim().length > 1 && /.+@.+\..+/.test(S.lead.email));
+  }
+});
+
+document.addEventListener('change', ev => {
+  const f = ev.target.closest('select[data-felt]');
+  if (f) S.lead[f.dataset.felt] = f.value;
+});
+
+render();
+</script>
