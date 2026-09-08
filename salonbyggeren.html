@@ -2,351 +2,334 @@
 <title>Salonbyggeren</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@75..125,400..900&family=Figtree:wght@400;500;600;700;800&family=Source+Serif+4:opsz,wght@8..60,400;8..60,600&display=swap">
 <style>
 :root{
-  --ground:#F5F4F7; --surface:#FFFFFF; --surface-2:#EEECF4; --surface-3:#E5E2EE;
-  --line:#DEDAE8; --line-strong:#C3BCD4;
-  --ink:#1B1722; --ink-2:#4B4459; --ink-3:#7B7389;
-  --accent:#5A3FA0; --accent-2:#3E2B72; --accent-soft:#EBE5FA; --on-accent:#FFFFFF;
-  --good:#1F6B4E; --good-soft:#E0F0E8;
-  --warn:#8A5A10; --warn-soft:#F7EBD6;
-  --crit:#992E3D; --crit-soft:#F8E3E6;
-  --brass:#7E6224; --brass-soft:#F3EDDC;
-  --shadow-sm:0 1px 2px rgba(27,23,34,.06);
-  --shadow:0 1px 2px rgba(27,23,34,.05), 0 10px 28px -16px rgba(27,23,34,.30);
-  --radius:10px;
-  --serif:"Bodoni Moda", "Times New Roman", serif;
-  --sans:"Archivo", "Helvetica Neue", Arial, sans-serif;
-  --mono:"IBM Plex Mono", ui-monospace, "SFMono-Regular", Menlo, monospace;
+  /* Just Add People — hvid, varm lysegrå, sort. Grøn til besparelse, gylden til vurdering. */
+  --paper:#FFFFFF;
+  --tile:#F3F2F0;
+  --tile-2:#EAE8E4;
+  --line:#E4E2DE;
+  --line-2:#CFCCC6;
+  --ink:#141414;
+  --ink-2:#5C5A57;
+  --ink-3:#8D8A85;
+  --green:#17A34A;
+  --green-tile:#E6F5EC;
+  --gold:#E5A02F;
+  --taupe:#8A7F72;
+  --r:14px;
+  --pill:999px;
+  --display:"Archivo","Helvetica Neue",Arial,sans-serif;
+  --sans:"Figtree","Helvetica Neue",Arial,sans-serif;
+  --serif:"Source Serif 4",Georgia,"Times New Roman",serif;
 }
-@media (prefers-color-scheme: dark){
-  :root:not([data-theme="light"]){
-    --ground:#141119; --surface:#1D1926; --surface-2:#262133; --surface-3:#2F2940;
-    --line:#332C44; --line-strong:#4A4160;
-    --ink:#F2EFF7; --ink-2:#BEB6CD; --ink-3:#8C8499;
-    --accent:#B49BF5; --accent-2:#CDBBFF; --accent-soft:#2B2242; --on-accent:#1A1424;
-    --good:#6FD4A7; --good-soft:#15302A;
-    --warn:#E6B468; --warn-soft:#332710;
-    --crit:#F19BA7; --crit-soft:#3A1E24;
-    --brass:#D8B36B; --brass-soft:#2E2716;
-    --shadow-sm:0 1px 2px rgba(0,0,0,.4);
-    --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -16px rgba(0,0,0,.8);
-  }
-}
-:root[data-theme="dark"]{
-  --ground:#141119; --surface:#1D1926; --surface-2:#262133; --surface-3:#2F2940;
-  --line:#332C44; --line-strong:#4A4160;
-  --ink:#F2EFF7; --ink-2:#BEB6CD; --ink-3:#8C8499;
-  --accent:#B49BF5; --accent-2:#CDBBFF; --accent-soft:#2B2242; --on-accent:#1A1424;
-  --good:#6FD4A7; --good-soft:#15302A;
-  --warn:#E6B468; --warn-soft:#332710;
-  --crit:#F19BA7; --crit-soft:#3A1E24;
-  --brass:#D8B36B; --brass-soft:#2E2716;
-  --shadow-sm:0 1px 2px rgba(0,0,0,.4);
-  --shadow:0 1px 2px rgba(0,0,0,.3), 0 10px 28px -16px rgba(0,0,0,.8);
-}
-
 *{box-sizing:border-box}
 body{
-  margin:0; background:var(--ground); color:var(--ink);
-  font-family:var(--sans); font-size:15px; line-height:1.55;
+  margin:0; background:var(--paper); color:var(--ink);
+  font-family:var(--sans); font-size:15.5px; line-height:1.55;
   -webkit-font-smoothing:antialiased;
 }
-h1,h2,h3,h4{margin:0; text-wrap:balance; font-weight:500}
+h1,h2,h3,h4{margin:0; text-wrap:balance}
 p{margin:0}
 button{font:inherit; color:inherit}
-:focus-visible{outline:2px solid var(--accent); outline-offset:2px; border-radius:4px}
+:focus-visible{outline:2px solid var(--ink); outline-offset:2px; border-radius:6px}
 @media (prefers-reduced-motion: reduce){*{animation:none!important; transition:none!important}}
 
-/* ---------- chrome ---------- */
+.caps{
+  font-family:var(--display); font-weight:900; font-stretch:88%;
+  text-transform:uppercase; letter-spacing:-.004em; line-height:.96;
+}
+
+/* ---------- prototypebjælke ---------- */
 .proto{
-  background:var(--ink); color:var(--ground);
-  font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase;
-  padding:7px 20px; display:flex; gap:14px; flex-wrap:wrap; justify-content:center; text-align:center;
+  background:var(--ink); color:#fff; text-align:center;
+  font-family:var(--sans); font-size:11.5px; font-weight:600; letter-spacing:.04em;
+  padding:8px 20px;
 }
-.proto span{opacity:.62}
-.masthead{
-  border-bottom:1px solid var(--line); background:var(--surface);
-  position:sticky; top:0; z-index:30;
-}
+.proto span{opacity:.6; font-weight:400}
+
+/* ---------- masthead ---------- */
+.masthead{background:var(--paper); position:sticky; top:0; z-index:40}
 .masthead-in{
-  max-width:1200px; margin:0 auto; padding:14px 24px;
-  display:flex; align-items:center; gap:18px; justify-content:space-between;
+  max-width:1280px; margin:0 auto; padding:14px 22px;
+  display:flex; align-items:center; gap:22px;
 }
-.brand{display:flex; align-items:baseline; gap:10px; min-width:0}
-.brand b{font-family:var(--serif); font-size:21px; font-weight:500; letter-spacing:.01em}
-.brand em{
-  font-family:var(--mono); font-style:normal; font-size:10.5px; letter-spacing:.13em;
-  text-transform:uppercase; color:var(--ink-3); white-space:nowrap;
+.menu-pill{
+  display:inline-flex; align-items:center; gap:9px; background:var(--tile);
+  border-radius:12px; padding:11px 16px 11px 13px; font-weight:600; font-size:14.5px; flex:none;
 }
-.steps{display:flex; gap:6px; align-items:center; list-style:none; margin:0; padding:0}
-.steps li{
-  width:34px; height:4px; border-radius:2px; background:var(--surface-3);
+.menu-pill svg{display:block}
+.wordmark{
+  font-family:var(--display); font-weight:900; font-stretch:80%;
+  font-size:23px; letter-spacing:-.015em; text-transform:uppercase;
+  white-space:nowrap; flex:none;
 }
-.steps li.done{background:var(--accent)}
-.steps li.now{background:var(--accent); box-shadow:0 0 0 3px var(--accent-soft)}
-.step-label{font-family:var(--mono); font-size:11px; color:var(--ink-3); letter-spacing:.06em; white-space:nowrap}
-@media(max-width:720px){ .steps{display:none} }
+.search{
+  flex:1; max-width:640px; background:var(--tile); border-radius:var(--pill);
+  padding:13px 22px; display:flex; align-items:center; gap:11px; color:var(--ink-3); font-size:15px;
+}
+.mh-right{display:flex; gap:22px; margin-left:auto; flex:none}
+.mh-ico{display:grid; justify-items:center; gap:2px; font-size:12.5px; font-weight:500}
+@media(max-width:900px){ .search, .mh-right{display:none} }
+
+/* ---------- trinbjælke ---------- */
+.stepbar{border-top:1px solid var(--line); border-bottom:1px solid var(--line); background:var(--paper)}
+.stepbar-in{
+  max-width:1280px; margin:0 auto; padding:11px 22px;
+  display:flex; align-items:center; justify-content:space-between; gap:18px;
+}
+.stepbar-in span{font-size:12.5px; font-weight:600; letter-spacing:.02em; color:var(--ink-2)}
+.steps{display:flex; gap:5px; list-style:none; margin:0; padding:0}
+.steps li{width:38px; height:3px; border-radius:2px; background:var(--tile-2)}
+.steps li.done, .steps li.now{background:var(--ink)}
+.steps li.now{box-shadow:0 0 0 3px var(--tile)}
+@media(max-width:600px){ .steps{display:none} }
 
 /* ---------- layout ---------- */
-.wrap{max-width:1200px; margin:0 auto; padding:34px 24px 90px}
-.bench{display:grid; grid-template-columns:minmax(0,1fr) 330px; gap:44px; align-items:start}
-@media(max-width:1000px){ .bench{grid-template-columns:1fr; gap:30px} }
+.wrap{max-width:1280px; margin:0 auto; padding:40px 22px 100px}
+.bench{display:grid; grid-template-columns:minmax(0,1fr) 340px; gap:48px; align-items:start}
+@media(max-width:1040px){ .bench{grid-template-columns:1fr; gap:34px} }
 .bench.solo{grid-template-columns:minmax(0,1fr)}
-.bench.solo .stage{max-width:900px}
+.bench.solo .stage{max-width:940px; margin:0 auto}
 
-.eyebrow{
-  font-family:var(--mono); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
-  color:var(--accent); margin-bottom:12px; display:flex; gap:9px; align-items:center;
+.eyebrow{font-size:12.5px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); margin-bottom:16px}
+.stage h2{
+  font-family:var(--display); font-weight:900; font-stretch:88%;
+  text-transform:uppercase; letter-spacing:-.006em; line-height:.97;
+  font-size:clamp(34px,5.2vw,60px);
 }
-.eyebrow::before{content:""; width:20px; height:1px; background:var(--accent); flex:none}
-.stage h2{font-family:var(--serif); font-size:clamp(28px,3.6vw,40px); line-height:1.12; letter-spacing:-.01em}
-.lede{color:var(--ink-2); max-width:60ch; margin-top:12px; font-size:16px}
-.stage section{margin-top:34px}
+.lede{color:var(--ink-2); max-width:62ch; margin-top:16px; font-size:16.5px}
+.stage section{margin-top:40px}
 .stage h3{
-  font-size:13px; font-family:var(--mono); letter-spacing:.1em; text-transform:uppercase;
-  color:var(--ink-3); margin-bottom:14px; padding-bottom:9px; border-bottom:1px solid var(--line);
+  font-size:20px; font-weight:700; letter-spacing:-.01em; margin-bottom:16px;
+  display:flex; align-items:baseline; justify-content:space-between; gap:16px;
 }
+.stage h3 em{font-style:normal; font-size:13.5px; font-weight:500; color:var(--ink-3)}
 
-/* ---------- controls ---------- */
+/* ---------- valgkort ---------- */
 .opts{display:grid; gap:10px}
-.opts.two{grid-template-columns:repeat(auto-fit,minmax(220px,1fr))}
+.opts.two{grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
 .opts.par{grid-template-columns:repeat(2,minmax(0,1fr))}
 @media(max-width:520px){ .opts.par{grid-template-columns:1fr} }
 .opt{
-  display:flex; gap:13px; align-items:flex-start; text-align:left; width:100%;
-  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
-  padding:14px 16px; cursor:pointer; transition:border-color .15s, background .15s;
+  display:flex; gap:14px; align-items:flex-start; text-align:left; width:100%;
+  background:var(--paper); border:1px solid var(--line); border-radius:var(--r);
+  padding:16px 18px; cursor:pointer; transition:border-color .15s, background .15s;
 }
-.opt:hover{border-color:var(--line-strong)}
+.opt:hover{border-color:var(--line-2); background:var(--tile)}
 .opt .tick{
-  flex:none; width:18px; height:18px; border-radius:50%; border:1.5px solid var(--line-strong);
-  margin-top:2px; display:grid; place-items:center;
+  flex:none; width:20px; height:20px; border-radius:50%; border:1.5px solid var(--line-2);
+  margin-top:1px; display:grid; place-items:center; background:var(--paper);
 }
-.opt.sq .tick{border-radius:5px}
-.opt[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft)}
-.opt[aria-pressed="true"] .tick{border-color:var(--accent); background:var(--accent)}
-.opt[aria-pressed="true"] .tick::after{content:""; width:7px; height:7px; border-radius:50%; background:var(--on-accent)}
+.opt.sq .tick{border-radius:6px}
+.opt[aria-pressed="true"]{border-color:var(--ink); background:var(--tile)}
+.opt[aria-pressed="true"] .tick{border-color:var(--ink); background:var(--ink)}
+.opt[aria-pressed="true"] .tick::after{content:""; width:7px; height:7px; border-radius:50%; background:#fff}
 .opt.sq[aria-pressed="true"] .tick::after{
   width:5px; height:9px; border-radius:0; background:none;
-  border:solid var(--on-accent); border-width:0 2px 2px 0; transform:rotate(42deg) translate(-1px,-1px);
+  border:solid #fff; border-width:0 2px 2px 0; transform:rotate(42deg) translate(-1px,-1px);
 }
-.opt strong{display:block; font-weight:600; font-size:14.5px}
-.opt small{display:block; color:var(--ink-3); font-size:13px; line-height:1.45; margin-top:3px}
+.opt strong{display:block; font-weight:600; font-size:15px}
+.opt small{display:block; color:var(--ink-3); font-size:13.5px; line-height:1.45; margin-top:4px}
 
-.rows{border:1px solid var(--line); border-radius:var(--radius); overflow:hidden; background:var(--surface)}
+/* ---------- pladsrækker med kategoricirkler ---------- */
+.rows{display:grid; gap:10px}
 .row{
-  display:flex; align-items:center; gap:16px; padding:13px 16px;
-  border-bottom:1px solid var(--line);
+  display:flex; align-items:center; gap:16px; padding:13px 18px 13px 13px;
+  background:var(--paper); border:1px solid var(--line); border-radius:var(--r);
 }
-.row:last-child{border-bottom:0}
+.circ{
+  width:62px; height:62px; border-radius:50%; background:var(--tile);
+  display:grid; place-items:center; flex:none;
+}
+.circ svg{display:block; width:38px; height:38px}
 .row .txt{flex:1; min-width:0}
-.row .txt strong{display:block; font-weight:600; font-size:14.5px}
-.row .txt small{color:var(--ink-3); font-size:12.5px}
-.stepper{display:flex; align-items:center; gap:2px; flex:none}
+.row .txt strong{display:block; font-weight:600; font-size:15px}
+.row .txt small{color:var(--ink-3); font-size:13px}
+.stepper{display:flex; align-items:center; gap:4px; flex:none}
 .stepper button{
-  width:32px; height:32px; border-radius:7px; border:1px solid var(--line-strong);
-  background:var(--surface); cursor:pointer; font-size:17px; line-height:1;
-  display:grid; place-items:center; transition:background .12s;
+  width:38px; height:38px; border-radius:50%; border:1px solid var(--line-2);
+  background:var(--paper); cursor:pointer; font-size:18px; line-height:1;
+  display:grid; place-items:center; transition:background .12s, border-color .12s;
 }
-.stepper button:hover:not(:disabled){background:var(--surface-2)}
-.stepper button:disabled{opacity:.32; cursor:default}
-.stepper output{
-  min-width:38px; text-align:center; font-family:var(--mono); font-size:16px;
-  font-variant-numeric:tabular-nums;
-}
+.stepper button:hover:not(:disabled){background:var(--ink); border-color:var(--ink); color:#fff}
+.stepper button:disabled{opacity:.3; cursor:default}
+.stepper output{min-width:36px; text-align:center; font-size:17px; font-weight:700; font-variant-numeric:tabular-nums}
 
-/* ---------- rail ---------- */
-.rail{position:sticky; top:86px; display:grid; gap:14px}
-@media(max-width:1000px){ .rail{position:static} }
-.card{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius)}
-.rail-head{
-  padding:15px 17px 13px; border-bottom:1px solid var(--line);
-  display:flex; justify-content:space-between; align-items:baseline; gap:10px;
-}
-.rail-head h4{font-family:var(--serif); font-size:19px}
-.rail-head span{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3)}
-.spec{padding:6px 17px 14px; margin:0; display:grid; gap:0}
-.spec div{
-  display:flex; justify-content:space-between; gap:12px; align-items:baseline;
-  padding:8px 0; border-bottom:1px dotted var(--line);
-}
+/* ---------- sidepanel ---------- */
+.rail{position:sticky; top:96px; display:grid; gap:14px}
+@media(max-width:1040px){ .rail{position:static} }
+.card{background:var(--paper); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
+.rail-head{padding:18px 20px 14px; display:flex; justify-content:space-between; align-items:baseline; gap:10px}
+.rail-head h4{font-size:19px; font-weight:700; letter-spacing:-.01em}
+.rail-head span{font-size:11.5px; font-weight:600; letter-spacing:.06em; text-transform:uppercase; color:var(--ink-3)}
+.spec{padding:0 20px 16px; margin:0}
+.spec div{display:flex; justify-content:space-between; gap:12px; align-items:baseline; padding:9px 0; border-bottom:1px solid var(--line)}
 .spec div:last-child{border-bottom:0}
-.spec dt{color:var(--ink-2); font-size:13.5px}
-.spec dd{margin:0; font-family:var(--mono); font-size:13.5px; font-variant-numeric:tabular-nums; text-align:right}
-.spec dd i{font-style:normal; color:var(--accent); font-size:12px}
-.spec .muted dd{color:var(--ink-3)}
-.rail-note{
-  padding:12px 17px; background:var(--surface-2); border-top:1px solid var(--line);
-  font-size:12.5px; color:var(--ink-2); display:flex; gap:9px; align-items:flex-start;
-  border-radius:0 0 var(--radius) var(--radius);
-}
-.rail-note b{font-family:var(--mono); font-size:11px; letter-spacing:.08em; text-transform:uppercase; color:var(--accent); flex:none}
+.spec dt{color:var(--ink-2); font-size:14px}
+.spec dd{margin:0; font-size:14px; font-weight:600; font-variant-numeric:tabular-nums; text-align:right}
+.spec dd i{font-style:normal; color:var(--green); font-size:12.5px}
+.spec .muted dd{color:var(--ink-3); font-weight:400}
+.rail-note{padding:14px 20px; background:var(--tile); font-size:13px; color:var(--ink-2)}
+.rail-note b{display:block; font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink); margin-bottom:3px}
 
-/* ---------- insights ---------- */
-.insight{
-  background:var(--surface); border:1px solid var(--line); border-left:3px solid var(--ink-3);
-  border-radius:var(--radius); padding:16px 18px; display:grid; gap:9px;
-}
-.insight.kritisk{border-left-color:var(--crit)}
-.insight.anbefalet{border-left-color:var(--warn)}
-.insight.info{border-left-color:var(--accent)}
-.insight-top{display:flex; gap:11px; align-items:center; flex-wrap:wrap}
-.tag{
-  font-family:var(--mono); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
-  padding:3px 8px; border-radius:20px; white-space:nowrap;
-}
-.tag.kritisk{background:var(--crit-soft); color:var(--crit)}
-.tag.anbefalet{background:var(--warn-soft); color:var(--warn)}
-.tag.info{background:var(--accent-soft); color:var(--accent)}
-.insight h4{font-size:16px; font-weight:600; line-height:1.3}
-.insight p{color:var(--ink-2); font-size:14px; max-width:62ch}
-.insight .src{font-family:var(--mono); font-size:11px; color:var(--ink-3)}
+/* ---------- indsigter ---------- */
+.insight{background:var(--paper); border:1px solid var(--line); border-radius:var(--r); padding:20px 22px; display:grid; gap:10px}
+.insight-top{display:flex; gap:10px; align-items:center; flex-wrap:wrap}
+.tag{font-size:11.5px; font-weight:700; letter-spacing:.03em; padding:5px 12px; border-radius:var(--pill); white-space:nowrap}
+.tag.kritisk{background:var(--ink); color:#fff}
+.tag.anbefalet{background:var(--tile-2); color:var(--ink)}
+.tag.info{background:var(--paper); color:var(--ink-2); border:1px solid var(--line)}
+.insight .src{font-size:12.5px; color:var(--ink-3)}
+.insight h4{font-size:19px; font-weight:700; letter-spacing:-.012em; line-height:1.25}
+.insight p{color:var(--ink-2); font-size:15px; max-width:64ch}
 .addon{
-  margin-top:4px; display:flex; align-items:center; gap:12px; justify-content:space-between;
-  background:var(--surface-2); border-radius:8px; padding:11px 13px; flex-wrap:wrap;
+  margin-top:6px; display:flex; align-items:center; gap:14px; justify-content:space-between;
+  background:var(--tile); border-radius:12px; padding:13px 15px; flex-wrap:wrap;
 }
-.addon .lbl{font-size:13.5px; font-weight:600}
-.addon .lbl small{display:block; font-weight:400; color:var(--ink-3); font-size:12.5px}
+.addon .lbl{font-size:14px; font-weight:600}
+.addon .lbl small{display:block; font-weight:400; color:var(--ink-3); font-size:13px}
 .toggle{
-  border:1px solid var(--line-strong); background:var(--surface); border-radius:20px;
-  padding:6px 13px 6px 9px; display:flex; align-items:center; gap:8px; cursor:pointer;
-  font-size:13px; font-weight:500; white-space:nowrap;
+  border:1px solid var(--line-2); background:var(--paper); border-radius:var(--pill);
+  padding:9px 17px 9px 12px; display:flex; align-items:center; gap:9px; cursor:pointer;
+  font-size:13.5px; font-weight:600; white-space:nowrap; transition:background .12s;
 }
-.toggle .dot{width:15px; height:15px; border-radius:50%; border:1.5px solid var(--line-strong); display:grid; place-items:center}
-.toggle[aria-pressed="true"]{border-color:var(--accent); background:var(--accent-soft); color:var(--accent-2)}
-.toggle[aria-pressed="true"] .dot{background:var(--accent); border-color:var(--accent)}
+.toggle .dot{width:16px; height:16px; border-radius:50%; border:1.5px solid var(--line-2); display:grid; place-items:center}
+.toggle:hover{border-color:var(--ink)}
+.toggle[aria-pressed="true"]{border-color:var(--ink); background:var(--ink); color:#fff}
+.toggle[aria-pressed="true"] .dot{background:#fff; border-color:#fff}
 .toggle[aria-pressed="true"] .dot::after{
-  content:""; width:4px; height:8px; border:solid var(--on-accent); border-width:0 2px 2px 0;
+  content:""; width:4px; height:8px; border:solid var(--ink); border-width:0 2px 2px 0;
   transform:rotate(42deg) translate(-1px,-1px);
 }
 
-/* ---------- price ---------- */
-.pricehead{
-  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
-  padding:24px 26px; display:grid; gap:18px; box-shadow:var(--shadow);
-}
-.pricehead .pkg{font-family:var(--serif); font-size:clamp(24px,3vw,32px); line-height:1.15}
-.pricehead .sub{color:var(--ink-2); font-size:14.5px}
-.figs{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:2px; background:var(--line); border-radius:8px; overflow:hidden}
-.fig{background:var(--surface); padding:14px 16px}
-.fig dt{font-family:var(--mono); font-size:10.5px; letter-spacing:.1em; text-transform:uppercase; color:var(--ink-3)}
-.fig dd{margin:5px 0 0; font-size:22px; font-family:var(--mono); font-variant-numeric:tabular-nums; letter-spacing:-.02em}
-.fig.hero{background:var(--accent-soft)}
-.fig.hero dd{color:var(--accent-2)}
-.fig.save dd{color:var(--good)}
-.fig small{display:block; font-size:12px; color:var(--ink-3); font-family:var(--sans); margin-top:3px}
+/* ---------- pris ---------- */
+.pricehead{background:var(--tile); border-radius:var(--r); padding:30px 32px; display:grid; gap:22px}
+.pricehead .pkg{font-family:var(--serif); font-size:clamp(26px,3.4vw,38px); line-height:1.12; letter-spacing:-.01em}
+.pricehead .sub{color:var(--ink-2); font-size:15px; margin-top:6px}
+.pricetag{display:flex; align-items:baseline; gap:14px; flex-wrap:wrap}
+.pricetag b{font-size:clamp(34px,4.6vw,50px); font-weight:800; letter-spacing:-.025em; line-height:1; font-variant-numeric:tabular-nums}
+.pricetag s{color:var(--ink-3); font-size:20px; font-weight:500}
+.badge{background:var(--green); color:#fff; font-size:14px; font-weight:700; padding:5px 11px; border-radius:8px}
+.figs{display:grid; grid-template-columns:repeat(auto-fit,minmax(160px,1fr)); gap:10px}
+.fig{background:var(--paper); border-radius:12px; padding:16px 18px}
+.fig dt{font-size:12.5px; font-weight:600; letter-spacing:.04em; text-transform:uppercase; color:var(--ink-3)}
+.fig dd{margin:7px 0 0; font-size:24px; font-weight:700; letter-spacing:-.02em; font-variant-numeric:tabular-nums}
+.fig small{display:block; font-size:12.5px; color:var(--ink-3); margin-top:3px; font-weight:400}
+.fig.save dd{color:var(--green)}
 
-table.lines{width:100%; border-collapse:collapse; font-size:14px}
+.scroll{overflow-x:auto; border:1px solid var(--line); border-radius:var(--r)}
+table.lines{width:100%; border-collapse:collapse; font-size:14.5px; background:var(--paper)}
 table.lines th{
-  text-align:left; font-family:var(--mono); font-size:10.5px; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--ink-3); font-weight:400;
-  padding:9px 10px; border-bottom:1px solid var(--line-strong);
+  text-align:left; font-size:12px; letter-spacing:.05em; text-transform:uppercase;
+  color:var(--ink-3); font-weight:600; padding:12px 14px; border-bottom:1px solid var(--line);
 }
-table.lines td{padding:9px 10px; border-bottom:1px solid var(--line); vertical-align:top}
-table.lines td.n, table.lines th.n{text-align:right; font-family:var(--mono); font-variant-numeric:tabular-nums; white-space:nowrap}
+table.lines td{padding:11px 14px; border-bottom:1px solid var(--line); vertical-align:top}
+table.lines td.n, table.lines th.n{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
 table.lines td.was{color:var(--ink-3); text-decoration:line-through}
-table.lines tr.grp td{
-  background:var(--surface-2); font-family:var(--mono); font-size:10.5px; letter-spacing:.1em;
-  text-transform:uppercase; color:var(--ink-2); padding:7px 10px;
-}
-table.lines tr.sum td{border-top:1.5px solid var(--ink); border-bottom:0; font-weight:600; font-size:15px; padding-top:12px}
-.scroll{overflow-x:auto; border:1px solid var(--line); border-radius:var(--radius); background:var(--surface)}
+table.lines tr.grp td{background:var(--tile); font-size:12px; letter-spacing:.05em; text-transform:uppercase; font-weight:700; padding:9px 14px}
+table.lines tr.sum td{border-top:2px solid var(--ink); border-bottom:0; font-weight:700; font-size:16px; padding-top:14px}
 
-.seg{display:inline-flex; background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:3px; gap:3px}
-.seg button{
-  border:0; background:none; padding:7px 14px; border-radius:6px; cursor:pointer;
-  font-size:13.5px; font-family:var(--mono); font-variant-numeric:tabular-nums;
-}
-.seg button[aria-pressed="true"]{background:var(--accent); color:var(--on-accent)}
+.seg{display:inline-flex; background:var(--tile); border-radius:var(--pill); padding:4px; gap:4px}
+.seg button{border:0; background:none; padding:9px 18px; border-radius:var(--pill); cursor:pointer; font-size:14px; font-weight:600; font-variant-numeric:tabular-nums}
+.seg button[aria-pressed="true"]{background:var(--ink); color:#fff}
 
-.slider{display:grid; gap:7px}
+.case{display:grid; gap:16px; background:var(--tile); border-radius:var(--r); padding:26px 28px}
+.case h4{font-family:var(--serif); font-size:24px; font-weight:600; letter-spacing:-.01em}
+.slider{display:grid; gap:8px}
 .slider .top{display:flex; justify-content:space-between; align-items:baseline; gap:12px}
-.slider label{font-size:13.5px; color:var(--ink-2)}
-.slider output{font-family:var(--mono); font-size:14px; font-variant-numeric:tabular-nums}
-input[type=range]{width:100%; accent-color:var(--accent)}
+.slider label{font-size:14px; color:var(--ink-2)}
+.slider output{font-size:15px; font-weight:700; font-variant-numeric:tabular-nums}
+input[type=range]{width:100%; accent-color:var(--ink)}
+.verdict{font-size:15.5px; color:var(--ink); max-width:64ch; line-height:1.6}
+.verdict b{font-weight:700}
 
-.case{display:grid; gap:14px; background:var(--brass-soft); border:1px solid var(--line); border-radius:var(--radius); padding:20px 22px}
-.case h4{font-family:var(--serif); font-size:21px}
-.case .verdict{font-size:15px; color:var(--ink); max-width:62ch}
-.case .verdict b{color:var(--brass)}
-
-/* ---------- form ---------- */
-form.lead{display:grid; gap:14px; max-width:560px}
-.field{display:grid; gap:6px}
-.field label{font-size:13px; font-weight:600}
+/* ---------- formular ---------- */
+form.lead{display:grid; gap:16px; max-width:580px}
+.field{display:grid; gap:7px}
+.field label{font-size:13.5px; font-weight:600}
 .field input, .field select{
-  font:inherit; padding:11px 13px; border-radius:8px; border:1px solid var(--line-strong);
-  background:var(--surface); color:var(--ink); width:100%;
+  font:inherit; padding:13px 16px; border-radius:12px; border:1px solid var(--line-2);
+  background:var(--paper); color:var(--ink); width:100%;
 }
+.field input::placeholder{color:var(--ink-3)}
 .field .hint{font-size:12.5px; color:var(--ink-3)}
-.grid2{display:grid; grid-template-columns:1fr 1fr; gap:14px}
+.grid2{display:grid; grid-template-columns:1fr 1fr; gap:16px}
 @media(max-width:560px){ .grid2{grid-template-columns:1fr} }
-.consent{display:flex; gap:11px; align-items:flex-start; font-size:13.5px; color:var(--ink-2); line-height:1.5}
-.consent input{margin-top:3px; width:17px; height:17px; accent-color:var(--accent); flex:none}
+.consent{display:flex; gap:12px; align-items:flex-start; font-size:14px; color:var(--ink-2); line-height:1.5}
+.consent input{margin-top:3px; width:18px; height:18px; accent-color:var(--ink); flex:none}
 
-/* ---------- buttons ---------- */
-.actions{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:32px}
+/* ---------- knapper ---------- */
+.actions{display:flex; gap:12px; align-items:center; flex-wrap:wrap; margin-top:38px}
 .btn{
-  border:1px solid transparent; border-radius:9px; padding:12px 22px; cursor:pointer;
-  font-weight:600; font-size:14.5px; display:inline-flex; align-items:center; gap:9px;
-  transition:background .14s, border-color .14s;
+  border:1px solid var(--ink); border-radius:var(--pill); padding:14px 28px; cursor:pointer;
+  font-weight:600; font-size:15px; display:inline-flex; align-items:center; gap:9px; transition:background .14s, color .14s;
 }
-.btn.primary{background:var(--accent); color:var(--on-accent)}
-.btn.primary:hover{background:var(--accent-2)}
-.btn.ghost{background:transparent; border-color:var(--line-strong); color:var(--ink-2)}
-.btn.ghost:hover{background:var(--surface-2)}
-.btn:disabled{opacity:.45; cursor:default}
-.btn.primary:disabled:hover{background:var(--accent)}
+.btn.primary{background:var(--ink); color:#fff}
+.btn.primary:hover{background:#000}
+.btn.ghost{background:var(--paper); color:var(--ink)}
+.btn.ghost:hover{background:var(--tile)}
+.btn:disabled{opacity:.35; cursor:default}
 
-.next{display:grid; gap:10px; grid-template-columns:repeat(auto-fit,minmax(230px,1fr))}
-.nextcard{
-  background:var(--surface); border:1px solid var(--line); border-radius:var(--radius);
-  padding:16px 18px; display:grid; gap:5px;
-}
-.nextcard b{font-size:14.5px}
-.nextcard small{color:var(--ink-3); font-size:13px; line-height:1.45}
-.nextcard .go{font-family:var(--mono); font-size:11.5px; color:var(--accent); letter-spacing:.05em; margin-top:4px}
+.next{display:grid; gap:12px; grid-template-columns:repeat(auto-fit,minmax(250px,1fr))}
+.nextcard{background:var(--paper); border:1px solid var(--line); border-radius:var(--r); padding:20px 22px; display:grid; gap:6px}
+.nextcard b{font-size:16px; font-weight:700; letter-spacing:-.01em}
+.nextcard small{color:var(--ink-3); font-size:13.5px; line-height:1.5}
+.nextcard .go{font-size:13.5px; font-weight:600; color:var(--taupe); text-decoration:underline; text-underline-offset:3px; margin-top:6px}
 
-.status{font-size:13.5px; color:var(--ink-2); min-height:20px}
-.status.err{color:var(--crit)}
-.status.ok{color:var(--good)}
-
-.callout{
-  border:1px dashed var(--line-strong); border-radius:var(--radius); padding:14px 16px;
-  font-size:13.5px; color:var(--ink-2); background:var(--surface-2);
-}
+.status{font-size:14px; color:var(--ink-2); min-height:22px; margin-top:6px}
+.status.err{color:#B3261E}
+.status.ok{color:var(--green)}
+.callout{border:1px solid var(--line); background:var(--tile); border-radius:var(--r); padding:16px 18px; font-size:14px; color:var(--ink-2)}
 .callout b{color:var(--ink)}
 
-/* report inline */
-.report{background:var(--surface); border:1px solid var(--line); border-radius:var(--radius); padding:26px 28px; display:grid; gap:26px}
-.report h3{margin-top:0}
+/* ---------- rapport ---------- */
+.report{background:var(--paper); border:1px solid var(--line); border-radius:var(--r); padding:34px 36px; display:grid; gap:30px}
+.report h3{font-size:13px; font-weight:700; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-3); margin-bottom:14px; display:block}
+.report .rtitle{font-family:var(--serif); font-size:32px; font-weight:600; letter-spacing:-.015em; line-height:1.15}
+@media(max-width:560px){ .report{padding:24px 20px} }
 @media print{
-  .proto, .masthead, .rail, .actions, .no-print{display:none!important}
-  body{background:#fff; color:#000}
+  .proto, .masthead, .stepbar, .rail, .actions, .no-print{display:none!important}
+  body{background:#fff}
   .wrap{padding:0; max-width:none}
   .bench{grid-template-columns:1fr}
   .report{border:0; padding:0}
 }
 </style>
 
-<div class="proto">
-  Prototype · konceptoplæg <span>Priser og produkter er eksempeldata — ikke et tilbud</span>
-</div>
+<div class="proto">Prototype · konceptoplæg &nbsp;<span>Produkter og priser er eksempeldata — ikke et tilbud</span></div>
 
 <header class="masthead">
   <div class="masthead-in">
-    <div class="brand">
-      <b>Salonbyggeren</b>
-      <em>Just Add People</em>
+    <span class="menu-pill">
+      <svg width="19" height="14" viewBox="0 0 19 14" fill="none" aria-hidden="true"><path d="M0 1h19M0 7h19M0 13h19" stroke="#141414" stroke-width="1.8"/></svg>
+      Menu
+    </span>
+    <b class="wordmark">Just Add People</b>
+    <div class="search">
+      <svg width="17" height="17" viewBox="0 0 17 17" fill="none" aria-hidden="true"><circle cx="7" cy="7" r="5.6" stroke="#8D8A85" stroke-width="1.7"/><path d="M11.4 11.4L16 16" stroke="#8D8A85" stroke-width="1.7" stroke-linecap="round"/></svg>
+      Søg her
     </div>
-    <div style="display:flex; align-items:center; gap:14px">
-      <span class="step-label" id="stepLabel">Trin 1 af 6</span>
-      <ol class="steps" id="stepDots"></ol>
+    <div class="mh-right">
+      <span class="mh-ico">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M10 18s6-5.2 6-10A6 6 0 004 8c0 4.8 6 10 6 10z" stroke="#141414" stroke-width="1.6"/><circle cx="10" cy="8" r="2.1" stroke="#141414" stroke-width="1.6"/></svg>
+        Showroom
+      </span>
+      <span class="mh-ico">
+        <svg width="20" height="20" viewBox="0 0 20 20" fill="none" aria-hidden="true"><path d="M3.4 6h13.2l-1 11.5a1 1 0 01-1 .9H5.4a1 1 0 01-1-.9L3.4 6z" stroke="#141414" stroke-width="1.6"/><path d="M7 7.5V5a3 3 0 016 0v2.5" stroke="#141414" stroke-width="1.6"/></svg>
+        Kurv
+      </span>
     </div>
   </div>
 </header>
+
+<div class="stepbar">
+  <div class="stepbar-in">
+    <span id="stepLabel">Trin 1 af 6</span>
+    <ol class="steps" id="stepDots"></ol>
+  </div>
+</div>
 
 <div class="wrap">
   <div class="bench">
@@ -354,7 +337,6 @@ form.lead{display:grid; gap:14px; max-width:560px}
     <aside class="rail" id="rail"></aside>
   </div>
 </div>
-
 <script>
 "use strict";
 
@@ -364,6 +346,14 @@ form.lead{display:grid; gap:14px; max-width:560px}
    ============================================================ */
 
 const kr = n => new Intl.NumberFormat('da-DK',{maximumFractionDigits:0}).format(Math.round(n)) + ' kr.';
+const IKON = {
+  klip:'<svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true"><rect x="9" y="14" width="16" height="5" rx="2.5" stroke="#141414" stroke-width="1.5"/><path d="M22 14V7.5a2 2 0 00-2-2h-4" stroke="#141414" stroke-width="1.5"/><path d="M17 19v6M11 29l6-4 6 4" stroke="#141414" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  vask:'<svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true"><path d="M6 16h22c0 5-4.5 8.5-11 8.5S6 21 6 16z" stroke="#141414" stroke-width="1.5"/><path d="M17 16V9a3 3 0 013-3h4" stroke="#141414" stroke-width="1.5"/><path d="M11 27.5h12" stroke="#141414" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  farve:'<svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true"><rect x="9" y="6" width="16" height="19" rx="2" stroke="#141414" stroke-width="1.5"/><path d="M9 12h16M9 18h16" stroke="#141414" stroke-width="1.5"/><circle cx="12" cy="28" r="2" stroke="#141414" stroke-width="1.5"/><circle cx="22" cy="28" r="2" stroke="#141414" stroke-width="1.5"/></svg>',
+  lounge:'<svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true"><path d="M8 15v-3a2 2 0 012-2h14a2 2 0 012 2v3" stroke="#141414" stroke-width="1.5"/><rect x="6" y="15" width="22" height="8" rx="2.5" stroke="#141414" stroke-width="1.5"/><path d="M9 23v4M25 23v4" stroke="#141414" stroke-width="1.5" stroke-linecap="round"/></svg>',
+  reception:'<svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true"><path d="M5 13h24v14H5z" stroke="#141414" stroke-width="1.5"/><path d="M5 13l3-4h18l3 4" stroke="#141414" stroke-width="1.5" stroke-linejoin="round"/><path d="M13 27v-6h8v6" stroke="#141414" stroke-width="1.5"/></svg>',
+  headspa:'<svg width="34" height="34" viewBox="0 0 34 34" fill="none" aria-hidden="true"><circle cx="17" cy="12" r="5" stroke="#141414" stroke-width="1.5"/><path d="M7 21c2.5-2 4.5-2 7 0s4.5 2 7 0 4.5-2 6-1" stroke="#141414" stroke-width="1.5" stroke-linecap="round"/><path d="M7 26c2.5-2 4.5-2 7 0s4.5 2 7 0 4.5-2 6-1" stroke="#141414" stroke-width="1.5" stroke-linecap="round"/></svg>'
+};
 const pl = (n, e, f) => n + ' ' + (n === 1 ? e : f);
 const esc = s => String(s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
 
@@ -576,7 +566,7 @@ const opt = (act, val, on, titel, desc, sq) =>
   '<span class="tick"></span><span><strong>' + titel + '</strong>' + (desc ? '<small>' + desc + '</small>' : '') + '</span></button>';
 
 const tal = (act, key, v, navn, desc, min, max) =>
-  '<div class="row"><div class="txt"><strong>' + navn + '</strong><small>' + desc + '</small></div>' +
+  '<div class="row"><span class="circ">' + (IKON[key] || '') + '</span><div class="txt"><strong>' + navn + '</strong><small>' + desc + '</small></div>' +
   '<div class="stepper">' +
   '<button data-act="' + act + '" data-val="' + key + ':-1" aria-label="Færre ' + navn.toLowerCase() + '"' + (v <= min ? ' disabled' : '') + '>&minus;</button>' +
   '<output>' + v + '</output>' +
@@ -590,14 +580,14 @@ const nav = (tilbage, label, act, deaktiv) =>
   '</div>';
 
 const head = (nr, titel, lede) =>
-  '<div class="eyebrow">' + nr + '</div><h2>' + titel + '</h2><p class="lede">' + lede + '</p>';
+  '<div class="eyebrow">' + nr.replace(/^Trin \d+ af 6 · /, '') + '</div><h2>' + titel + '</h2><p class="lede">' + lede + '</p>';
 
 /* ---------- trinnene ---------- */
 function trinNu(){
   const a = [['0-5','0-5 år'],['6-10','6-10 år'],['11-15','11-15 år'],['16+','Over 15 år, eller overtaget med lokalet']];
-  return head('Trin 1 · Din salon i dag',
-    'Lad os starte med den salon, du står i.',
-    'Fire hurtige oplysninger. De afgør, hvad du får ud af resten — og hvad vi kan regne på til sidst.') +
+  return head('Trin 1 af 6 · Din salon i dag',
+    'Sådan står din salon i dag',
+    'Hej 👋 Lad os starte med det, du har. Fire hurtige oplysninger afgør, hvad du får ud af resten — og hvad vi kan regne på til sidst.') +
     '<section><h3>Pladser i dag</h3><div class="rows">' +
       tal('nu','klip', S.nu.klip, 'Klippepladser', 'Betjente pladser med stol og spejl', 1, 12) +
       tal('nu','vask', S.nu.vask, 'Vaskepladser', 'Keramikhoveder i drift', 0, 8) +
@@ -618,8 +608,8 @@ function trinSymptomer(){
     ['slidt','Salonen trænger visuelt','Betræk, spejle eller belysning er ikke, som da I åbnede.'],
     ['plads','Jeg har plads til overs','Et hjørne eller et lokale, der ikke bidrager med noget.']
   ];
-  return head('Trin 2 · Hverdagen',
-    'Hvad mærker du, når du lukker om lørdagen?',
+  return head('Trin 2 af 6 · Hverdagen',
+    'Hvad mærker du, når du lukker?',
     'Vælg det, du genkender. Det er her, vi finder ud af, hvad der reelt skal løses — ikke bare hvad der skal købes.') +
     '<section><h3>Vælg alt, der passer</h3><div class="opts">' +
       liste.map(x => opt('sym', x[0], S.symptomer.indexOf(x[0]) >= 0, x[1], x[2], true)).join('') +
@@ -634,8 +624,8 @@ function trinAmbition(){
     ['oplevelse','Løfte oplevelsen','Kunden skal kunne mærke forskel på min salon og den nede ad gaden.'],
     ['nyt','Et nyt indtægtsben','Head Spa eller behandlinger, jeg kan sælge til de kunder, jeg allerede har.']
   ];
-  return head('Trin 3 · Ambition',
-    'Hvad skal investeringen først og fremmest give dig?',
+  return head('Trin 3 af 6 · Ambition',
+    'Hvad skal det give dig?',
     'Vælg gerne to. Det styrer både hvilke pladser vi foreslår, og hvilke tal vi regner på til sidst.') +
     '<section><h3>Vælg det vigtigste</h3><div class="opts">' +
       liste.map(x => opt('amb', x[0], S.ambition.indexOf(x[0]) >= 0, x[1], x[2], true)).join('') +
@@ -645,8 +635,8 @@ function trinAmbition(){
 
 function trinPlan(){
   const P = S.plan;
-  return head('Trin 4 · Byg salonen',
-    'Sæt pladserne, som du gerne vil have dem.',
+  return head('Trin 4 af 6 · Byg salonen',
+    'Byg din nye salon',
     'Tænk i pladser frem for i møbler — vi sætter selv rullebord, spejl og fodstøtte på hver plads, så der ikke mangler noget på leveringsdagen.') +
     '<section><h3>Pladser i den nye salon</h3><div class="rows">' +
       tal('plan','klip', P.klip, 'Klippepladser', 'Stol, spejlkonsol, rullebord og fodstøtte pr. plads', 1, 14) +
@@ -685,10 +675,10 @@ function trinIndsigter(){
     '</div>';
   }).join('');
 
-  return head('Trin 5 · Faglige indsigter',
-    'Det her ville vi sige, hvis vi stod i salonen.',
+  return head('Trin 5 af 6 · Faglige indsigter',
+    'Det ville vi sige i salonen',
     'Baseret på dine svar. Til- og fravælg frit — det, du lader stå, følger med i pakken på næste side.') +
-    '<section><h3>' + list.length + ' indsigter til din salon</h3><div class="opts">' + kort + '</div></section>' +
+    '<section><h3>Indsigter til din salon<em>' + list.length + ' fundet ud fra dine svar</em></h3><div class="opts">' + kort + '</div></section>' +
     nav(true, 'Vis pakke og pris', 'frem');
 }
 
@@ -719,19 +709,20 @@ function trinPris(){
   if (P.farve) dele.push(pl(P.farve, 'farvebar', 'farvebarer'));
   if (P.headspa) dele.push(pl(P.headspa, 'Head Spa-plads', 'Head Spa-pladser'));
 
-  return head('Trin 6 · Pakke og pris',
-    pakkenavn(),
+  const pct = Math.round(b.spar / b.vejl * 100);
+  return head('Trin 6 af 6 · Pakke og pris',
+    'Din pakke og din pris',
     'Sådan ser din salon ud, når alt er talt med. Alle priser er ekskl. moms — og som altid ser du både den vejledende pris og vores.') +
 
     '<section><div class="pricehead">' +
-      '<div><div class="pkg">' + dele.join(' · ') + '</div>' +
-      '<p class="sub">' + STILARTER.find(s => s.id === S.stil).navn + ' · ' +
-        NIVEAUER.find(n => n.id === S.niveau).navn + ' · ' + b.stk + ' dele i alt</p></div>' +
+      '<div><div class="pkg">' + pakkenavn() + '</div>' +
+      '<p class="sub">' + dele.join(' · ') + ' · ' + STILARTER.find(s => s.id === S.stil).navn + ' · ' + b.stk + ' dele i alt</p></div>' +
+      '<div class="pricetag"><b id="figPris">' + kr(b.pris) + '</b><s>' + kr(b.vejl) + '</s>' +
+        '<span class="badge">&minus;' + pct + '%</span></div>' +
       '<dl class="figs">' +
-        '<div class="fig hero"><dt>Din pris</dt><dd id="figPris">' + kr(b.pris) + '</dd><small>ekskl. moms</small></div>' +
-        '<div class="fig"><dt>Vejledende</dt><dd>' + kr(b.vejl) + '</dd><small>listepris</small></div>' +
-        '<div class="fig save"><dt>Du sparer</dt><dd>' + kr(b.spar) + '</dd><small>' + Math.round(b.spar/b.vejl*100) + ' % under vejledende</small></div>' +
+        '<div class="fig save"><dt>Du sparer</dt><dd>' + kr(b.spar) + '</dd><small>under vejledende pris</small></div>' +
         '<div class="fig"><dt>Leasing</dt><dd id="figYd">' + kr(c.yd) + '</dd><small>pr. måned i ' + S.leasing + ' mdr.</small></div>' +
+        '<div class="fig"><dt>Inkl. moms</dt><dd>' + kr(b.pris * 1.25) + '</dd><small>til orientering</small></div>' +
       '</dl>' +
     '</div></section>' +
 
@@ -788,7 +779,7 @@ function trinLead(){
   const klar = L.navn.trim().length > 1 && /.+@.+\..+/.test(L.email);
 
   return head('Sidste skridt',
-    'Hvor skal rapporten sendes hen?',
+    'Hvor skal rapporten hen?',
     'Du får hele oplægget som ét dokument: din plan, indsigterne, styklisten, prisen og finansieringen — så du kan tage det med til revisoren, kompagnonen eller banken.') +
     '<section><h3>Dine oplysninger</h3><form class="lead" autocomplete="on">' +
       '<div class="grid2">' + felt('navn','Navn','text','Dit navn') + felt('salon','Salonens navn','text','Fx Salon Nord') + '</div>' +
@@ -809,8 +800,8 @@ function trinLead(){
 }
 
 function trinRapport(){
-  return head('Din rapport er klar',
-    'Salonrapport til ' + (S.lead.salon.trim() || S.lead.navn.trim() || 'din salon'),
+  return head('Rapport',
+    'Din rapport er klar',
     'Hele oplægget samlet ét sted. Hent det som fil, eller print det direkte — og tag de næste skridt, når du er klar.') +
     '<div class="actions no-print" style="margin-top:24px">' +
       '<button class="btn primary" data-act="hent">Hent rapporten</button>' +
@@ -850,7 +841,7 @@ function rapportKrop(){
 
   return '' +
   '<div><h3>Rapport</h3>' +
-    '<h2 style="font-family:var(--serif); font-size:30px; line-height:1.15">' + esc(pakkenavn()) + '</h2>' +
+    '<div class="rtitle">' + esc(pakkenavn()) + '</div>' +
     '<p class="lede">Udarbejdet til ' + esc(S.lead.salon.trim() || 'din salon') +
     (S.lead.navn.trim() ? ' ved ' + esc(S.lead.navn.trim()) : '') + ' · ' + dato + '</p></div>' +
 
@@ -879,7 +870,7 @@ function rapportKrop(){
     '<tbody>' + rk.join('') + '</tbody></table></div></div>' +
 
   '<div><h3>Økonomi</h3><dl class="figs">' +
-    '<div class="fig hero"><dt>Din pris</dt><dd>' + kr(b.pris) + '</dd><small>ekskl. moms</small></div>' +
+    '<div class="fig"><dt>Din pris</dt><dd>' + kr(b.pris) + '</dd><small>ekskl. moms</small></div>' +
     '<div class="fig save"><dt>Under vejledende</dt><dd>' + kr(b.spar) + '</dd><small>' + Math.round(b.spar/b.vejl*100) + ' %</small></div>' +
     '<div class="fig"><dt>Leasing</dt><dd>' + kr(c.yd) + '</dd><small>pr. md. i ' + S.leasing + ' mdr.</small></div>' +
     (c.dbKr > 0 ? '<div class="fig"><dt>Ekstra dækningsbidrag</dt><dd>' + kr(c.dbKr) + '</dd><small>pr. måned</small></div>' : '') +
