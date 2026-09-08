@@ -19,10 +19,24 @@ Rækkefølgen er bevidst: **ingen kroner vises, før salonen står rigtigt.**
 7. **Kontaktoplysninger** — lead-formularen ligger *efter* prisen
 8. **Rapport** — hele oplægget samlet, til download eller print
 
-## Kør den
+## Se den
 
-Åbn `salonbyggeren.html` i en browser. Ingen build, ingen afhængigheder ud over
-Google Fonts.
+**Som website:** `index.html` er forsiden. Slå GitHub Pages til under
+Settings → Pages med denne branch og mappen `/ (root)`, så ligger prototypen
+på `https://<bruger>.github.io/justaddpeople/`.
+
+**Lokalt:** åbn `index.html` i en browser. Ingen build-værktøjer, ingen
+afhængigheder ud over Google Fonts og jsPDF fra CDN.
+
+## To filer, én kilde
+
+`salonbyggeren.html` er kilden. Den er skrevet **uden** `<!doctype>`, `<html>`,
+`<head>` og `<body>`, fordi Artifact-udgivelsen selv pakker filen ind.
+
+`index.html` genereres ud fra den med `node build.js`, som lægger den
+manglende ramme omkring — herunder viewport-metaen, uden hvilken siden bliver
+ulæselig på mobil. **Ret altid i `salonbyggeren.html` og kør derefter
+`node build.js`**; ændringer direkte i `index.html` bliver overskrevet.
 
 ## Vigtigt om data
 
