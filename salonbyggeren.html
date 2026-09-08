@@ -50,7 +50,8 @@ button{font:inherit; color:inherit}
 .proto span{opacity:.6; font-weight:400}
 
 /* ---------- masthead ---------- */
-.masthead{background:var(--paper); position:sticky; top:0; z-index:40}
+.topbar{position:sticky; top:0; z-index:40; background:var(--paper)}
+.masthead{background:var(--paper)}
 .masthead-in{
   max-width:1280px; margin:0 auto; padding:14px 22px;
   display:flex; align-items:center; gap:22px;
@@ -79,7 +80,15 @@ button{font:inherit; color:inherit}
   max-width:1280px; margin:0 auto; padding:11px 22px;
   display:flex; align-items:center; justify-content:space-between; gap:18px;
 }
-.stepbar-in span{font-size:12.5px; font-weight:600; letter-spacing:.02em; color:var(--ink-2)}
+.stepbar-in .now-label{font-size:12.5px; font-weight:600; letter-spacing:.02em; color:var(--ink-2)}
+.stepbar-in .steps{margin-left:auto}
+.restart{
+  border:1px solid var(--line-2); background:var(--paper); border-radius:var(--pill);
+  padding:7px 15px; font-size:12.5px; font-weight:600; cursor:pointer; white-space:nowrap;
+  transition:background .12s, border-color .12s, color .12s;
+}
+.restart:hover{border-color:var(--ink); background:var(--tile)}
+.restart[data-bekraeft="ja"]{background:var(--ink); border-color:var(--ink); color:#fff}
 .steps{display:flex; gap:5px; list-style:none; margin:0; padding:0}
 .steps li{width:38px; height:3px; border-radius:2px; background:var(--tile-2)}
 .steps li.done, .steps li.now{background:var(--ink)}
@@ -158,8 +167,9 @@ button{font:inherit; color:inherit}
 .stepper output{min-width:36px; text-align:center; font-size:17px; font-weight:700; font-variant-numeric:tabular-nums}
 
 /* ---------- sidepanel ---------- */
-.rail{position:sticky; top:96px; display:grid; gap:14px}
-@media(max-width:1040px){ .rail{position:static} }
+.rail{position:sticky; top:132px; display:grid; gap:14px}
+/* Sidepanelet hører til den brede visning. Stablet under trinnet forvirrer det mere, end det hjælper. */
+@media(max-width:1040px){ .rail{display:none} }
 .card{background:var(--paper); border:1px solid var(--line); border-radius:var(--r); overflow:hidden}
 .rail-head{padding:18px 20px 14px; display:flex; justify-content:space-between; align-items:baseline; gap:10px}
 .rail-head h4{font-size:19px; font-weight:700; letter-spacing:-.01em}
@@ -173,6 +183,22 @@ button{font:inherit; color:inherit}
 .spec .muted dd{color:var(--ink-3); font-weight:400}
 .rail-note{padding:14px 20px; background:var(--tile); font-size:13px; color:var(--ink-2)}
 .rail-note b{display:block; font-size:11.5px; letter-spacing:.06em; text-transform:uppercase; color:var(--ink); margin-bottom:3px}
+
+/* ---------- fold-ud-indsigter undervejs ---------- */
+.kvik{
+  background:var(--tile); border-radius:12px; padding:15px 18px; margin-top:-3px;
+  display:grid; gap:7px; border-left:3px solid var(--ink);
+}
+.kvik.advar{border-left-color:var(--gold)}
+.kvik b{font-size:11.5px; font-weight:700; letter-spacing:.07em; text-transform:uppercase; color:var(--ink-3)}
+.kvik p{font-size:14.5px; color:var(--ink); line-height:1.5; max-width:60ch}
+.kvik .mini{
+  justify-self:start; margin-top:4px; border:1px solid var(--ink); background:var(--paper);
+  border-radius:var(--pill); padding:8px 16px; font-size:13px; font-weight:600; cursor:pointer;
+}
+.kvik .mini:hover{background:var(--ink); color:#fff}
+.kvik.ny{animation:fold .3s cubic-bezier(.2,.7,.3,1) both}
+@keyframes fold{from{opacity:0; transform:translateY(-8px)} to{opacity:1; transform:none}}
 
 /* ---------- indsigter ---------- */
 .insight{background:var(--paper); border:1px solid var(--line); border-radius:var(--r); padding:20px 22px; display:grid; gap:10px}
@@ -300,6 +326,7 @@ form.lead{display:grid; gap:16px; max-width:580px}
 
 <div class="proto">Prototype · konceptoplæg &nbsp;<span>Produkter og priser er eksempeldata — ikke et tilbud</span></div>
 
+<div class="topbar">
 <header class="masthead">
   <div class="masthead-in">
     <span class="menu-pill">
@@ -326,9 +353,11 @@ form.lead{display:grid; gap:16px; max-width:580px}
 
 <div class="stepbar">
   <div class="stepbar-in">
-    <span id="stepLabel">Trin 1 af 6</span>
+    <span class="now-label" id="stepLabel">Trin 1 af 6</span>
     <ol class="steps" id="stepDots"></ol>
+    <button class="restart" id="restart" data-act="omfra">Start forfra</button>
   </div>
+</div>
 </div>
 
 <div class="wrap">
@@ -402,6 +431,23 @@ const TILVALG = [
   {id:'montering', navn:'Levering, montering og bortkørsel',  enhed:'hele salonen',    per:'salon', priser:{solid:[6900,5400], kvalitet:[8900,6900], premium:[12500,9900]}}
 ];
 
+/* ---------- kvikindsigter, der folder ud undervejs ---------- */
+const KVIK = {
+  'sym:ryg':['Ergonomi','Otte ud af ti frisører får ondt i ryg eller skuldre. Det begynder næsten altid ved vasken, hvor du står foroverbøjet 20-30 gange om dagen.'],
+  'sym:ko':['Kapacitet','Kø koster dobbelt: kunden venter, og du kan ikke tage den næste ind. Flaskehalsen er sjældent stolen — den er vasken.'],
+  'sym:farve':['Belysning','Farven bliver bedømt i dagslys på vej hjem, ikke i din belysning. Det er dér, omfarvningerne kommer fra.'],
+  'sym:luft':['Arbejdsmiljø','Lugten er ikke bare ubehagelig. Ammoniak og persulfater fordamper netop dér, hvor du står bøjet over skålen.'],
+  'sym:lyd':['Akustik','To føntørrere i et rum med hårde flader lander på 70-75 dB. Det er niveauet, hvor samtalen dør.'],
+  'sym:slidt':['Kundeoplevelse','Kunden nævner det aldrig. Hun booker bare et andet sted næste gang.'],
+  'sym:plads':['Økonomi','Den tomme krog er salonens dyreste kvadratmeter — den betaler husleje hver måned uden at levere omsætning.'],
+  'amb:kapacitet':['Regnestykket','En fuldt udstyret klippeplads koster typisk 350-750 kr. om måneden på leasing. Den skal bruge cirka én kunde om ugen på at betale sig selv.'],
+  'amb:arbejdsmiljo':['Det lange løb','Ergonomi er ikke en udgift, men et spørgsmål om, hvor mange år du kan blive i faget. Det er den dyreste post at spare på.'],
+  'amb:oplevelse':['Kundeoplevelse','Kunder kan ikke bedømme en klipning fagligt. De bedømmer stolen, lyset, lyden og duften — og det er dét, de fortæller videre.'],
+  'amb:nyt':['Head Spa','En japansk Head Spa sælges typisk til 650-900 kr. for 45-60 minutter — til de kunder, du allerede har i kalenderen.'],
+  'niveau:premium':['Premium','På det niveau er det ikke møblet, du køber. Det er de 45 minutter, kunden ligger ned og fortæller om bagefter.'],
+  'stil:japansk':['Japansk ro','Roen kommer ikke af valnødden alene. Dæmpet lys og lav akustik er det, der faktisk får kunden til at falde til ro.']
+};
+
 /* ---------- tilstand ---------- */
 const S = {
   step:0,
@@ -416,7 +462,7 @@ const S = {
   leasing:36,
   bon:520, behDag:4, db:40, hsUge:5, hsPris:640,
   lead:{navn:'', salon:'', email:'', tlf:'', post:'', horisont:'3-6'},
-  sendt:false
+  sendt:false, senest:null, bekraeft:false
 };
 
 const TRIN = [
@@ -573,6 +619,15 @@ const tal = (act, key, v, navn, desc, min, max) =>
   '<button data-act="' + act + '" data-val="' + key + ':1" aria-label="Flere ' + navn.toLowerCase() + '"' + (v >= max ? ' disabled' : '') + '>+</button>' +
   '</div></div>';
 
+const kvik = (noegle, ny) => {
+  const k = KVIK[noegle];
+  if (!k) return '';
+  return '<div class="kvik' + (ny ? ' ny' : '') + '"><b>' + k[0] + '</b><p>' + k[1] + '</p></div>';
+};
+const kvikFri = (label, tekst, ny, advar, handling) =>
+  '<div class="kvik' + (ny ? ' ny' : '') + (advar ? ' advar' : '') + '"><b>' + label + '</b><p>' + tekst + '</p>' +
+  (handling ? '<button class="mini" data-act="' + handling[1] + '">' + handling[0] + '</button>' : '') + '</div>';
+
 const nav = (tilbage, label, act, deaktiv) =>
   '<div class="actions">' +
   (tilbage ? '<button class="btn ghost" data-act="tilbage">Tilbage</button>' : '') +
@@ -612,7 +667,10 @@ function trinSymptomer(){
     'Hvad mærker du, når du lukker?',
     'Vælg det, du genkender. Det er her, vi finder ud af, hvad der reelt skal løses — ikke bare hvad der skal købes.') +
     '<section><h3>Vælg alt, der passer</h3><div class="opts">' +
-      liste.map(x => opt('sym', x[0], S.symptomer.indexOf(x[0]) >= 0, x[1], x[2], true)).join('') +
+      liste.map(x => {
+        const on = S.symptomer.indexOf(x[0]) >= 0;
+        return opt('sym', x[0], on, x[1], x[2], true) + (on ? kvik('sym:' + x[0], S.senest === 'sym:' + x[0]) : '');
+      }).join('') +
     '</div></section>' +
     nav(true, 'Videre', 'frem');
 }
@@ -628,7 +686,10 @@ function trinAmbition(){
     'Hvad skal det give dig?',
     'Vælg gerne to. Det styrer både hvilke pladser vi foreslår, og hvilke tal vi regner på til sidst.') +
     '<section><h3>Vælg det vigtigste</h3><div class="opts">' +
-      liste.map(x => opt('amb', x[0], S.ambition.indexOf(x[0]) >= 0, x[1], x[2], true)).join('') +
+      liste.map(x => {
+        const on = S.ambition.indexOf(x[0]) >= 0;
+        return opt('amb', x[0], on, x[1], x[2], true) + (on ? kvik('amb:' + x[0], S.senest === 'amb:' + x[0]) : '');
+      }).join('') +
     '</div></section>' +
     nav(true, 'Videre', 'frem');
 }
@@ -640,17 +701,31 @@ function trinPlan(){
     'Tænk i pladser frem for i møbler — vi sætter selv rullebord, spejl og fodstøtte på hver plads, så der ikke mangler noget på leveringsdagen.') +
     '<section><h3>Pladser i den nye salon</h3><div class="rows">' +
       tal('plan','klip', P.klip, 'Klippepladser', 'Stol, spejlkonsol, rullebord og fodstøtte pr. plads', 1, 14) +
+      (P.klip > S.nu.klip ? kvikFri('Du udvider',
+        'Du lægger ' + pl(P.klip - S.nu.klip, 'plads', 'pladser') + ' til salonen. På sidste trin regner vi ud, ' +
+        'hvad ' + (P.klip - S.nu.klip === 1 ? 'den' : 'de') + ' skal levere for at betale sig selv.',
+        S.senest === 'plan:klip') : '') +
       tal('plan','vask', P.vask, 'Vaskepladser', 'Vaskeunit med keramikvask og sadelstol', 0, 8) +
+      (P.vask < Math.ceil(P.klip/2) ? kvikFri('Se lige her',
+        'Tommelfingerreglen er én vaskeplads pr. to klippepladser. Med ' + P.klip + ' klippepladser og ' +
+        pl(P.vask, 'vaskeplads', 'vaskepladser') + ' opstår køen ved vasken i de travleste to timer.',
+        S.senest === 'plan:vask' || S.senest === 'plan:klip', true, ['Tilføj en vaskeplads', 'addvask']) : '') +
       tal('plan','farve', P.farve, 'Farvebar', 'Arbejdsplads til blanding, med farvevogn', 0, 3) +
       tal('plan','lounge', P.lounge, 'Loungepladser', 'Siddepladser til venteområdet', 0, 10) +
       tal('plan','reception', P.reception, 'Reception', 'Disk med opbevaring og stol', 0, 2) +
       tal('plan','headspa', P.headspa, 'Head Spa-plads', 'Liggende vaskestol, behandlerstol og damp', 0, 4) +
+      (P.headspa > 0 ? kvikFri('Plads og vand',
+        'En Head Spa-plads kræver omkring 6 m², adgang til vand og et hjørne med ro. Til gengæld fylder ' +
+        'behandlingen de huller i kalenderen, klipningen ikke kan fylde.',
+        S.senest === 'plan:headspa') : '') +
     '</div></section>' +
     '<section><h3>Kvalitetsniveau</h3><div class="opts">' +
-      NIVEAUER.map(n => opt('niveau', n.id, S.niveau === n.id, n.navn, n.desc)).join('') +
+      NIVEAUER.map(n => opt('niveau', n.id, S.niveau === n.id, n.navn, n.desc) +
+        (S.niveau === n.id ? kvik('niveau:' + n.id, S.senest === 'niveau:' + n.id) : '')).join('') +
     '</div></section>' +
-    '<section><h3>Stilretning</h3><div class="opts two">' +
-      STILARTER.map(n => opt('stil', n.id, S.stil === n.id, n.navn, n.desc)).join('') +
+    '<section><h3>Stilretning</h3><div class="opts">' +
+      STILARTER.map(n => opt('stil', n.id, S.stil === n.id, n.navn, n.desc) +
+        (S.stil === n.id ? kvik('stil:' + n.id, S.senest === 'stil:' + n.id) : '')).join('') +
     '</div></section>' +
     nav(true, 'Se hvad vi lægger mærke til', 'frem');
 }
@@ -806,7 +881,6 @@ function trinRapport(){
     '<div class="actions no-print" style="margin-top:24px">' +
       '<button class="btn primary" data-act="hent">Hent rapporten</button>' +
       '<button class="btn ghost" data-act="print">Print eller gem som PDF</button>' +
-      '<button class="btn ghost" data-act="omfra">Start forfra</button>' +
     '</div><p class="status no-print" id="dlStatus"></p>' +
     '<section><div class="report">' + rapportKrop() + '</div></section>' +
     '<section class="no-print"><h3>Næste skridt</h3><div class="next">' +
@@ -980,6 +1054,9 @@ function render(){
   const dots = TRIN.map((t, i) =>
     '<li class="' + (i < S.step ? 'done' : i === S.step ? 'now' : '') + '" title="' + t.navn + '"></li>').join('');
   document.getElementById('stepDots').innerHTML = dots;
+  const rb = document.getElementById('restart');
+  rb.textContent = S.bekraeft ? 'Sikker? Klik igen' : 'Start forfra';
+  rb.dataset.bekraeft = S.bekraeft ? 'ja' : 'nej';
   document.getElementById('stepLabel').textContent =
     S.step <= 5 ? 'Trin ' + (S.step+1) + ' af 6 · ' + TRIN[S.step].navn
     : S.step === 6 ? 'Kontaktoplysninger' : 'Rapport';
@@ -1006,10 +1083,13 @@ function skift(n){
 }
 
 /* ---------- hændelser ---------- */
+let bekraeftTimer = null;
+
 document.addEventListener('click', ev => {
   const el = ev.target.closest('[data-act]');
   if (!el) return;
   const act = el.dataset.act, val = el.dataset.val;
+  if (act !== 'omfra' && S.bekraeft){ S.bekraeft = false; clearTimeout(bekraeftTimer); }
 
   if (act === 'frem'){ skift(S.step + 1); return; }
   if (act === 'tilbage'){ skift(Math.max(0, S.step - 1)); return; }
@@ -1017,13 +1097,28 @@ document.addEventListener('click', ev => {
   if (act === 'hent'){ hentRapport(); return; }
   if (act === 'print'){ window.print(); return; }
   if (act === 'omfra'){
-    S.step = 0; S.planInit = false; S.sendt = false;
+    if (!S.bekraeft){
+      S.bekraeft = true;
+      clearTimeout(bekraeftTimer);
+      bekraeftTimer = setTimeout(() => { S.bekraeft = false; render(); }, 4000);
+      const rb = document.getElementById('restart');
+      rb.textContent = 'Sikker? Klik igen'; rb.dataset.bekraeft = 'ja';
+      return;
+    }
+    clearTimeout(bekraeftTimer);
+    S.step = 0; S.planInit = false; S.sendt = false; S.bekraeft = false; S.senest = null;
+    S.nu = {klip:2, vask:1, alder:'6-10'};
+    S.symptomer = ['ryg','ko']; S.ambition = ['kapacitet'];
+    S.plan = {klip:3, vask:2, farve:1, lounge:3, reception:1, headspa:0};
+    S.niveau = 'kvalitet'; S.stil = 'nordisk'; S.leasing = 36;
+    S.bon = 520; S.behDag = 4; S.db = 40; S.hsUge = 5;
     S.tilvalg = {}; S.rort = {};
     S.lead = {navn:'', salon:'', email:'', tlf:'', post:'', horisont:'3-6'};
     render(); return;
   }
   if (act === 'nu' || act === 'plan'){
     const d = val.split(':'), key = d[0], delta = parseInt(d[1], 10);
+    S.senest = act + ':' + key;
     const maal = act === 'nu' ? S.nu : S.plan;
     const graenser = {klip:[act === 'nu' ? 1 : 1, act === 'nu' ? 12 : 14], vask:[0,8], farve:[0,3],
       lounge:[0,10], reception:[0,2], headspa:[0,4]};
@@ -1033,12 +1128,12 @@ document.addEventListener('click', ev => {
     render(); return;
   }
   if (act === 'alder'){ S.nu.alder = val; render(); return; }
-  if (act === 'niveau'){ S.niveau = val; render(); return; }
-  if (act === 'stil'){ S.stil = val; render(); return; }
+  if (act === 'niveau'){ S.niveau = val; S.senest = 'niveau:' + val; render(); return; }
+  if (act === 'stil'){ S.stil = val; S.senest = 'stil:' + val; render(); return; }
   if (act === 'sym' || act === 'amb'){
     const arr = act === 'sym' ? S.symptomer : S.ambition;
     const i = arr.indexOf(val);
-    if (i >= 0) arr.splice(i, 1); else arr.push(val);
+    if (i >= 0) { arr.splice(i, 1); S.senest = null; } else { arr.push(val); S.senest = act + ':' + val; }
     render(); return;
   }
   if (act === 'tilvalg'){
@@ -1047,6 +1142,7 @@ document.addEventListener('click', ev => {
     render(); return;
   }
   if (act === 'addvask'){
+    S.senest = 'plan:vask';
     S.plan.vask = Math.min(8, S.plan.vask + 1);
     synkTilvalg(); render(); return;
   }
