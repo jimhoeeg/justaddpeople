@@ -271,6 +271,53 @@ input[type=range]{width:100%; accent-color:var(--ink)}
 .verdict{font-size:15.5px; color:var(--ink); max-width:64ch; line-height:1.6}
 .verdict b{font-weight:700}
 
+/* ---------- levering ---------- */
+.lev{display:flex; gap:18px; align-items:center; background:var(--tile); border-radius:var(--r); padding:20px 24px; flex-wrap:wrap}
+.lev .prik{width:11px; height:11px; border-radius:50%; background:var(--green); flex:none}
+.lev .hoved{flex:1; min-width:220px}
+.lev b{display:block; font-size:20px; font-weight:700; letter-spacing:-.015em}
+.lev small{display:block; color:var(--ink-2); font-size:13.5px; margin-top:3px}
+.lager{display:inline-block; margin-left:9px; font-size:11px; font-weight:700; padding:2px 9px; border-radius:var(--pill); background:var(--green-tile); color:var(--green); vertical-align:1px}
+.lager.best{background:var(--tile-2); color:var(--ink-2)}
+
+/* ---------- faser ---------- */
+.fasehead{display:flex; align-items:baseline; justify-content:space-between; gap:14px; margin:28px 0 12px}
+.fasehead h4{font-size:19px; font-weight:700; letter-spacing:-.01em}
+.fasehead span{font-size:13.5px; color:var(--ink-3); white-space:nowrap}
+.fasehead:first-child{margin-top:0}
+
+/* ---------- regnskab ---------- */
+.konto{width:100%; border-collapse:collapse; font-size:14.5px}
+.konto td{padding:9px 0; border-bottom:1px solid var(--line-2)}
+.konto td.n{text-align:right; font-variant-numeric:tabular-nums; white-space:nowrap}
+.konto td small{display:block; color:var(--ink-3); font-size:12.5px}
+.konto tr.neg td{color:var(--ink-2)}
+.konto tr.sum td{font-weight:700; border-bottom:0; border-top:2px solid var(--ink); padding-top:12px; font-size:16px}
+.konto tr.slut td{border-bottom:0}
+.chips{display:flex; gap:8px; flex-wrap:wrap}
+.chip{
+  border:1px solid var(--line-2); background:var(--paper); border-radius:var(--pill);
+  padding:9px 17px; font-size:13.5px; font-weight:600; cursor:pointer;
+}
+.chip:hover{border-color:var(--ink)}
+.chip[aria-pressed="true"]{background:var(--ink); border-color:var(--ink); color:#fff}
+
+/* ---------- hjælp fra et menneske ---------- */
+.hjaelp{
+  margin-top:34px; display:flex; gap:18px; align-items:center; flex-wrap:wrap;
+  border:1px solid var(--line); border-radius:var(--r); padding:20px 22px; background:var(--paper);
+}
+.hj-ikon{
+  width:48px; height:48px; border-radius:50%; background:var(--tile); flex:none;
+  display:grid; place-items:center; font-weight:700; font-size:15px; letter-spacing:.02em;
+}
+.hj-txt{flex:1; min-width:230px}
+.hj-txt b{display:block; font-size:15.5px; font-weight:700}
+.hj-txt small{display:block; color:var(--ink-2); font-size:13.5px; line-height:1.5; margin-top:3px; max-width:56ch}
+.hj-knap{display:flex; gap:9px; flex-wrap:wrap}
+.btn.sm{padding:10px 19px; font-size:13.5px}
+.hj-kvit{font-size:13.5px; color:var(--ink-2); background:var(--tile); border-radius:10px; padding:11px 14px; flex:1; min-width:230px}
+
 /* ---------- formular ---------- */
 form.lead{display:grid; gap:16px; max-width:580px}
 .field{display:grid; gap:7px}
@@ -366,6 +413,9 @@ form.lead{display:grid; gap:16px; max-width:580px}
     <aside class="rail" id="rail"></aside>
   </div>
 </div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.8.2/jspdf.plugin.autotable.min.js"></script>
+
 <script>
 "use strict";
 
@@ -400,35 +450,35 @@ const STILARTER = [
 
 /* ---------- produktkatalog (eksempeldata) ---------- */
 const KATALOG = [
-  {id:'stol',      navn:'Frisørstol',                  gruppe:'Klippepladser', per:'klip',      priser:{solid:[4299,3499],   kvalitet:[8995,6995],   premium:[16500,12900]}},
-  {id:'spejl',     navn:'Spejlkonsol med opbevaring',  gruppe:'Klippepladser', per:'klip',      priser:{solid:[3195,2295],   kvalitet:[4795,3495],   premium:[8400,5900]}},
-  {id:'rullebord', navn:'Rullebord',                   gruppe:'Klippepladser', per:'klip',      priser:{solid:[1295,995],    kvalitet:[1995,1495],   premium:[3200,2400]}},
-  {id:'fodstotte', navn:'Fodstøtte',                   gruppe:'Klippepladser', per:'klip',      priser:{solid:[649,449],     kvalitet:[895,649],     premium:[1350,995]}},
+  {id:'stol',      navn:'Frisørstol',                  gruppe:'Klippepladser', fase:1, per:'klip',      priser:{solid:[4299,3499],   kvalitet:[8995,6995],   premium:[16500,12900]}},
+  {id:'spejl',     navn:'Spejlkonsol med opbevaring',  gruppe:'Klippepladser', fase:1, per:'klip',      priser:{solid:[3195,2295],   kvalitet:[4795,3495],   premium:[8400,5900]}},
+  {id:'rullebord', navn:'Rullebord',                   gruppe:'Klippepladser', fase:1, per:'klip',      priser:{solid:[1295,995],    kvalitet:[1995,1495],   premium:[3200,2400]}},
+  {id:'fodstotte', navn:'Fodstøtte',                   gruppe:'Klippepladser', fase:1, per:'klip',      priser:{solid:[649,449],     kvalitet:[895,649],     premium:[1350,995]}},
 
-  {id:'vaskeunit', navn:'Vaskeunit med keramikvask',   gruppe:'Vaskepladser',  per:'vask',      priser:{solid:[6499,4999],   kvalitet:[12900,9900],  premium:[23900,18500]}},
-  {id:'vasketab',  navn:'Sadelstol til vaskepladsen',  gruppe:'Vaskepladser',  per:'vask',      priser:{solid:[1795,1295],   kvalitet:[2795,1995],   premium:[4400,3200]}},
+  {id:'vaskeunit', navn:'Vaskeunit med keramikvask',   gruppe:'Vaskepladser', fase:1,  per:'vask',      priser:{solid:[6499,4999],   kvalitet:[12900,9900],  premium:[23900,18500]}},
+  {id:'vasketab',  navn:'Sadelstol til vaskepladsen',  gruppe:'Vaskepladser', fase:1,  per:'vask',      priser:{solid:[1795,1295],   kvalitet:[2795,1995],   premium:[4400,3200]}},
 
-  {id:'farvebar',  navn:'Farvebar med opbevaring',     gruppe:'Farvebar',      per:'farve',     priser:{solid:[4990,3900],   kvalitet:[8400,6500],   premium:[14200,11000]}},
-  {id:'farvevogn', navn:'Farvevogn',                   gruppe:'Farvebar',      per:'farve',     priser:{solid:[1695,1295],   kvalitet:[2590,1995],   premium:[3800,2900]}},
+  {id:'farvebar',  navn:'Farvebar med opbevaring',     gruppe:'Farvebar', fase:1,      per:'farve',     priser:{solid:[4990,3900],   kvalitet:[8400,6500],   premium:[14200,11000]}},
+  {id:'farvevogn', navn:'Farvevogn',                   gruppe:'Farvebar', fase:1,      per:'farve',     priser:{solid:[1695,1295],   kvalitet:[2590,1995],   premium:[3800,2900]}},
 
-  {id:'lounge',    navn:'Loungestol',                  gruppe:'Venteområde',   per:'lounge',    priser:{solid:[2495,1895],   kvalitet:[3890,2995],   premium:[6300,4900]}},
-  {id:'sofabord',  navn:'Sofabord',                    gruppe:'Venteområde',   per:'loungeSet', priser:{solid:[1695,1295],   kvalitet:[2590,1995],   premium:[4400,3400]}},
+  {id:'lounge',    navn:'Loungestol',                  gruppe:'Venteområde', fase:2,   per:'lounge',    priser:{solid:[2495,1895],   kvalitet:[3890,2995],   premium:[6300,4900]}},
+  {id:'sofabord',  navn:'Sofabord',                    gruppe:'Venteområde', fase:2,   per:'loungeSet', priser:{solid:[1695,1295],   kvalitet:[2590,1995],   premium:[4400,3400]}},
 
-  {id:'disk',      navn:'Receptionsdisk',              gruppe:'Reception',     per:'reception', priser:{solid:[9900,7900],   kvalitet:[15900,12500], premium:[25400,19900]}},
-  {id:'diskstol',  navn:'Receptionsstol',              gruppe:'Reception',     per:'reception', priser:{solid:[1695,1295],   kvalitet:[2590,1995],   premium:[4200,3200]}},
+  {id:'disk',      navn:'Receptionsdisk',              gruppe:'Reception', fase:2,     per:'reception', priser:{solid:[9900,7900],   kvalitet:[15900,12500], premium:[25400,19900]}},
+  {id:'diskstol',  navn:'Receptionsstol',              gruppe:'Reception', fase:2,     per:'reception', priser:{solid:[1695,1295],   kvalitet:[2590,1995],   premium:[4200,3200]}},
 
-  {id:'hsvask',    navn:'Head Spa vaskestol, liggende',gruppe:'Head Spa',      per:'headspa',   priser:{solid:[42900,34900], kvalitet:[59900,49000], premium:[88000,72000]}},
-  {id:'hsstol',    navn:'Head Spa behandlerstol',      gruppe:'Head Spa',      per:'headspa',   priser:{solid:[15900,12900], kvalitet:[23400,18900], premium:[32900,26500]}},
-  {id:'hsmist',    navn:'Hair steamer til damp',       gruppe:'Head Spa',      per:'headspa',   priser:{solid:[18400,14900], kvalitet:[24900,19900], premium:[30900,24900]}}
+  {id:'hsvask',    navn:'Head Spa vaskestol, liggende',gruppe:'Head Spa', fase:2,      per:'headspa',   priser:{solid:[42900,34900], kvalitet:[59900,49000], premium:[88000,72000]}},
+  {id:'hsstol',    navn:'Head Spa behandlerstol',      gruppe:'Head Spa', fase:2,      per:'headspa',   priser:{solid:[15900,12900], kvalitet:[23400,18900], premium:[32900,26500]}},
+  {id:'hsmist',    navn:'Hair steamer til damp',       gruppe:'Head Spa', fase:2,      per:'headspa',   priser:{solid:[18400,14900], kvalitet:[24900,19900], premium:[30900,24900]}}
 ];
 
 const TILVALG = [
-  {id:'lys',       navn:'Arbejdsbelysning med CRI 95',        enhed:'pr. klippeplads', per:'klip',  priser:{solid:[2190,1690], kvalitet:[3290,2490], premium:[4900,3900]}},
-  {id:'udsugning', navn:'Punktudsugning ved farvebaren',      enhed:'pr. farvebar',    per:'farve', priser:{solid:[5400,4200], kvalitet:[7400,5900], premium:[11200,8900]}},
-  {id:'sadelstol', navn:'Ergonomisk sadelstol med hæve/sænk', enhed:'pr. arbejdsplads',per:'klip',  priser:{solid:[2890,2290], kvalitet:[4190,3290], premium:[6200,4900]}},
-  {id:'maatte',    navn:'Ergonomisk gulvmåtte',               enhed:'pr. klippeplads', per:'klip',  priser:{solid:[1090,790],  kvalitet:[1490,1090], premium:[2100,1590]}},
-  {id:'akustik',   navn:'Akustikpaneler til loftet',          enhed:'sæt til salonen', per:'salon', priser:{solid:[6400,4900], kvalitet:[9200,7200], premium:[13500,10500]}},
-  {id:'montering', navn:'Levering, montering og bortkørsel',  enhed:'hele salonen',    per:'salon', priser:{solid:[6900,5400], kvalitet:[8900,6900], premium:[12500,9900]}}
+  {id:'lys', fase:1,       navn:'Arbejdsbelysning med CRI 95',        enhed:'pr. klippeplads', per:'klip',  priser:{solid:[2190,1690], kvalitet:[3290,2490], premium:[4900,3900]}},
+  {id:'udsugning', fase:1, navn:'Punktudsugning ved farvebaren',      enhed:'pr. farvebar',    per:'farve', priser:{solid:[5400,4200], kvalitet:[7400,5900], premium:[11200,8900]}},
+  {id:'sadelstol', fase:1, navn:'Ergonomisk sadelstol med hæve/sænk', enhed:'pr. arbejdsplads',per:'klip',  priser:{solid:[2890,2290], kvalitet:[4190,3290], premium:[6200,4900]}},
+  {id:'maatte', fase:2,    navn:'Ergonomisk gulvmåtte',               enhed:'pr. klippeplads', per:'klip',  priser:{solid:[1090,790],  kvalitet:[1490,1090], premium:[2100,1590]}},
+  {id:'akustik', fase:2,   navn:'Akustikpaneler til loftet',          enhed:'sæt til salonen', per:'salon', priser:{solid:[6400,4900], kvalitet:[9200,7200], premium:[13500,10500]}},
+  {id:'montering', fase:1, navn:'Levering, montering og bortkørsel',  enhed:'hele salonen',    per:'salon', priser:{solid:[6900,5400], kvalitet:[8900,6900], premium:[12500,9900]}}
 ];
 
 /* ---------- kvikindsigter, der folder ud undervejs ---------- */
@@ -460,7 +510,9 @@ const S = {
   stil:'nordisk',
   tilvalg:{}, rort:{},
   leasing:36,
-  bon:520, behDag:4, db:40, hsUge:5, hsPris:640,
+  bon:520, behDag:4, hsUge:5, hsPris:640,
+  bemanding:'ansat', lonpct:45, stolleje:4500,
+  gammelt:'byt', faser:false, kontakt:null,
   lead:{navn:'', salon:'', email:'', tlf:'', post:'', horisont:'3-6'},
   sendt:false, senest:null, bekraeft:false
 };
@@ -473,6 +525,32 @@ const TRIN = [
   {id:'indsigter', navn:'Faglige indsigter'},
   {id:'pris',      navn:'Pakke og pris'}
 ];
+
+/* ---------- levering ---------- */
+function isoUge(d){
+  const t = new Date(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()));
+  t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7));
+  const nytaar = new Date(Date.UTC(t.getUTCFullYear(), 0, 1));
+  return {uge: Math.ceil((((t - nytaar) / 86400000) + 1) / 7), aar: t.getUTCFullYear()};
+}
+function levering(){
+  let uger = S.niveau === 'premium' ? 6 : S.niveau === 'kvalitet' ? 3 : 2;
+  if (S.plan.headspa > 0) uger = Math.max(uger, 8);
+  const d = new Date(); d.setDate(d.getDate() + uger * 7);
+  const u = isoUge(d);
+  return {uger, uge:u.uge, aar:u.aar};
+}
+function paaLager(gruppe){
+  return !(gruppe === 'Head Spa' || S.niveau === 'premium');
+}
+
+/* ---------- modregning for det gamle inventar ---------- */
+const ALDERFAKTOR = {'0-5':1, '6-10':0.6, '11-15':0.3, '16+':0.12};
+function modregning(){
+  if (S.gammelt !== 'byt') return 0;
+  const raa = S.nu.klip * 1200 + S.nu.vask * 1800;
+  return Math.round(raa * ALDERFAKTOR[S.nu.alder] / 100) * 100;
+}
 
 /* ---------- beregning ---------- */
 function antal(per){
@@ -490,18 +568,26 @@ function antal(per){
 
 function beregn(){
   const grupper = [];
-  const push = (gruppe, navn, stk, pr) => {
+  const push = (gruppe, navn, stk, pr, fase, lager) => {
     if (stk <= 0) return;
     let g = grupper.find(x => x.navn === gruppe);
-    if (!g) { g = {navn:gruppe, linjer:[]}; grupper.push(g); }
-    g.linjer.push({navn, stk, vejl:pr[0], pris:pr[1], sumVejl:pr[0]*stk, sumPris:pr[1]*stk});
+    if (!g) { g = {navn:gruppe, fase, linjer:[]}; grupper.push(g); }
+    g.linjer.push({navn, stk, fase, lager, vejl:pr[0], pris:pr[1], sumVejl:pr[0]*stk, sumPris:pr[1]*stk});
   };
-  KATALOG.forEach(i => push(i.gruppe, i.navn, antal(i.per), i.priser[S.niveau]));
-  TILVALG.forEach(t => { if (S.tilvalg[t.id]) push('Tilvalg fra dine indsigter', t.navn, antal(t.per), t.priser[S.niveau]); });
+  KATALOG.forEach(i => push(i.gruppe, i.navn, antal(i.per), i.priser[S.niveau], i.fase, paaLager(i.gruppe)));
+  TILVALG.forEach(t => { if (S.tilvalg[t.id]) push('Tilvalg fra dine indsigter', t.navn, antal(t.per), t.priser[S.niveau], t.fase, true); });
 
-  let vejl = 0, pris = 0, stk = 0;
-  grupper.forEach(g => g.linjer.forEach(l => { vejl += l.sumVejl; pris += l.sumPris; stk += l.stk; }));
-  return {grupper, vejl, pris, stk, spar: vejl - pris};
+  let vejl = 0, pris = 0, stk = 0, f1 = 0, f2 = 0, f1Vejl = 0, f1Stk = 0;
+  grupper.forEach(g => g.linjer.forEach(l => {
+    vejl += l.sumVejl; pris += l.sumPris; stk += l.stk;
+    if (S.faser && l.fase === 2) { f2 += l.sumPris; }
+    else { f1 += l.sumPris; f1Vejl += l.sumVejl; f1Stk += l.stk; }
+  }));
+  const byt = modregning();
+  const visPris = S.faser ? f1 : pris, visVejl = S.faser ? f1Vejl : vejl;
+  return {grupper, vejl, pris, stk, f1, f2, f1Vejl, f1Stk, byt,
+          spar: visVejl - visPris, visPris, visVejl,
+          betal: Math.max(0, visPris - byt)};
 }
 
 function ydelse(total, mdr){
@@ -512,13 +598,16 @@ function ydelse(total, mdr){
 
 function businesscase(total){
   const ekstraKlip = Math.max(0, S.plan.klip - S.nu.klip);
-  const omsKlip = ekstraKlip * S.behDag * 22 * S.bon;
-  const omsHs = S.plan.headspa > 0 ? S.hsUge * 4.33 * S.hsPris : 0;
+  const leje = S.bemanding === 'leje';
+  const omsKlip = leje ? ekstraKlip * S.stolleje : ekstraKlip * S.behDag * 22 * S.bon;
+  const omsHs = (S.plan.headspa > 0 && !S.faser) ? S.hsUge * 4.33 * S.hsPris : 0;
   const oms = omsKlip + omsHs;
-  const dbKr = oms * S.db/100;
+  const produkter = (leje ? omsHs : oms) * 0.08;
+  const lon = S.bemanding === 'ansat' ? omsKlip * S.lonpct/100 : 0;
+  const bidrag = oms - produkter - lon;
   const yd = ydelse(total, S.leasing);
-  return {ekstraKlip, omsKlip, omsHs, oms, dbKr, yd, netto: dbKr - yd,
-          maaneder: dbKr > 0 ? total/dbKr : null};
+  return {ekstraKlip, leje, omsKlip, omsHs, oms, produkter, lon, bidrag, yd,
+          netto: bidrag - yd, maaneder: bidrag > 0 ? total/bidrag : null};
 }
 
 /* ---------- faglige indsigter ---------- */
@@ -628,6 +717,39 @@ const kvikFri = (label, tekst, ny, advar, handling) =>
   '<div class="kvik' + (ny ? ' ny' : '') + (advar ? ' advar' : '') + '"><b>' + label + '</b><p>' + tekst + '</p>' +
   (handling ? '<button class="mini" data-act="' + handling[1] + '">' + handling[0] + '</button>' : '') + '</div>';
 
+const hjaelp = () =>
+  '<div class="hjaelp">' +
+    '<span class="hj-ikon">K&amp;A</span>' +
+    (S.kontakt
+      ? '<div class="hj-kvit"><b>' + S.kontakt + '</b> — i den færdige version åbner der en booking her, ' +
+        'og Klaus eller Anja vender tilbage samme dag. Prototypen sender ikke noget.</div>'
+      : '<div class="hj-txt"><b>I tvivl undervejs?</b>' +
+        '<small>Klaus og Anja har indrettet saloner i 30 år. Vi kan også køre ud med stolene, ' +
+        'så du kan prøve dem i din egen salon, dit eget lys og din egen plads — det koster ikke noget.</small></div>' +
+        '<div class="hj-knap">' +
+          '<button class="btn ghost sm" data-act="kontakt" data-val="Fremvisning i din salon">Book gratis fremvisning</button>' +
+          '<button class="btn ghost sm" data-act="kontakt" data-val="Vi ringer dig op">Ring mig op</button>' +
+        '</div>') +
+  '</div>';
+
+function gammeltKvik(valg){
+  const ny = S.senest === 'gammelt:' + valg;
+  if (valg === 'byt'){
+    return kvikFri('Skønnet modregning',
+      'Ud fra ' + pl(S.nu.klip,'klippeplads','klippepladser') + ' og ' + pl(S.nu.vask,'vaskeplads','vaskepladser') +
+      ' på ' + (S.nu.alder === '16+' ? 'over 15' : S.nu.alder) + ' år lyder vores foreløbige vurdering på cirka <b>' +
+      kr(modregning()) + '</b>. Det endelige beløb fastsætter vi, når vi har set inventaret — i salonen eller på et par billeder.', ny);
+  }
+  if (valg === 'bortkoer'){
+    return kvikFri('Samme dag',
+      'Bortkørsel hører til leveringsdagen, ikke til ugen efter. Vi tager det gamle med retur i samme vogn, ' +
+      'så du ikke står med en salon fuld af to sæt møbler.', ny);
+  }
+  return kvikFri('Så lad det arbejde',
+    'En stol, du ikke bruger selv, er den dyreste kvadratmeter i salonen. Lejes den ud i et salonfællesskab, ' +
+    'bliver den en fast månedlig indtægt i stedet for en udgift.', ny);
+}
+
 const nav = (tilbage, label, act, deaktiv) =>
   '<div class="actions">' +
   (tilbage ? '<button class="btn ghost" data-act="tilbage">Tilbage</button>' : '') +
@@ -650,6 +772,7 @@ function trinNu(){
     '<section><h3>Hvor gammelt er inventaret?</h3><div class="opts par">' +
       a.map(x => opt('alder', x[0], S.nu.alder === x[0], x[1], '')).join('') +
     '</div></section>' +
+    hjaelp() +
     nav(false, 'Videre', 'frem');
 }
 
@@ -672,6 +795,7 @@ function trinSymptomer(){
         return opt('sym', x[0], on, x[1], x[2], true) + (on ? kvik('sym:' + x[0], S.senest === 'sym:' + x[0]) : '');
       }).join('') +
     '</div></section>' +
+    hjaelp() +
     nav(true, 'Videre', 'frem');
 }
 
@@ -691,6 +815,7 @@ function trinAmbition(){
         return opt('amb', x[0], on, x[1], x[2], true) + (on ? kvik('amb:' + x[0], S.senest === 'amb:' + x[0]) : '');
       }).join('') +
     '</div></section>' +
+    hjaelp() +
     nav(true, 'Videre', 'frem');
 }
 
@@ -727,6 +852,14 @@ function trinPlan(){
       STILARTER.map(n => opt('stil', n.id, S.stil === n.id, n.navn, n.desc) +
         (S.stil === n.id ? kvik('stil:' + n.id, S.senest === 'stil:' + n.id) : '')).join('') +
     '</div></section>' +
+    '<section><h3>Dit nuværende inventar<em>Det skal jo også et sted hen</em></h3><div class="opts">' +
+      [['byt','Byt det ind','Vi vurderer det og modregner i prisen. Vi sælger selv brugt inventar, så det får et liv mere.'],
+       ['bortkoer','Kør det væk','Vi tager det med retur på leveringsdagen og håndterer det miljørigtigt.'],
+       ['behold','Jeg beholder det','Fx til en udlejet stol, et bagrum eller en plads, du selv bygger videre på.']]
+      .map(x => opt('gammelt', x[0], S.gammelt === x[0], x[1], x[2]) +
+        (S.gammelt === x[0] ? gammeltKvik(x[0]) : '')).join('') +
+    '</div></section>' +
+    hjaelp() +
     nav(true, 'Se hvad vi lægger mærke til', 'frem');
 }
 
@@ -754,6 +887,7 @@ function trinIndsigter(){
     'Det ville vi sige i salonen',
     'Baseret på dine svar. Til- og fravælg frit — det, du lader stå, følger med i pakken på næste side.') +
     '<section><h3>Indsigter til din salon<em>' + list.length + ' fundet ud fra dine svar</em></h3><div class="opts">' + kort + '</div></section>' +
+    hjaelp() +
     nav(true, 'Vis pakke og pris', 'frem');
 }
 
@@ -766,17 +900,76 @@ function pakkenavn(){
   return a + ' · ' + n;
 }
 
-function trinPris(){
-  const b = beregn(), c = businesscase(b.pris);
-  const P = S.plan;
-  const rk = [];
+function styklisteTabel(b, fase){
+  const rk = []; let sum = 0, sumVejl = 0, stk = 0;
   b.grupper.forEach(g => {
+    const linjer = g.linjer.filter(l => fase === null || l.fase === fase);
+    if (!linjer.length) return;
     rk.push('<tr class="grp"><td colspan="4">' + g.navn + '</td></tr>');
-    g.linjer.forEach(l => rk.push('<tr><td>' + l.navn + '</td><td class="n">' + l.stk + '</td>' +
-      '<td class="n was">' + kr(l.sumVejl) + '</td><td class="n">' + kr(l.sumPris) + '</td></tr>'));
+    linjer.forEach(l => {
+      sum += l.sumPris; sumVejl += l.sumVejl; stk += l.stk;
+      rk.push('<tr><td>' + l.navn + '<span class="lager' + (l.lager ? '' : ' best') + '">' +
+        (l.lager ? 'På lager' : 'Bestilling') + '</span></td><td class="n">' + l.stk + '</td>' +
+        '<td class="n was">' + kr(l.sumVejl) + '</td><td class="n">' + kr(l.sumPris) + '</td></tr>');
+    });
   });
-  rk.push('<tr class="sum"><td>Din pakke, ' + b.stk + ' dele</td><td class="n"></td>' +
-    '<td class="n was">' + kr(b.vejl) + '</td><td class="n">' + kr(b.pris) + '</td></tr>');
+  rk.push('<tr class="sum"><td>I alt, ' + stk + ' dele</td><td class="n"></td>' +
+    '<td class="n was">' + kr(sumVejl) + '</td><td class="n">' + kr(sum) + '</td></tr>');
+  return '<div class="scroll"><table class="lines"><thead><tr><th>Vare</th><th class="n">Stk.</th>' +
+    '<th class="n">Vejledende</th><th class="n">Din pris</th></tr></thead><tbody>' + rk.join('') + '</tbody></table></div>';
+}
+
+function kontoData(c){
+  const r = [];
+  if (c.omsKlip > 0) r.push([c.leje
+    ? 'Stolleje, ' + pl(c.ekstraKlip, 'udlejet plads', 'udlejede pladser')
+    : 'Omsætning fra ' + pl(c.ekstraKlip, 'ny plads', 'nye pladser'), c.omsKlip, '']);
+  if (c.omsHs > 0) r.push(['Head Spa-behandlinger', c.omsHs, '']);
+  if (c.produkter > 0) r.push(['Produktforbrug, 8 %', -c.produkter, 'neg']);
+  if (c.lon > 0) r.push(['Løn til frisøren, ' + S.lonpct + ' % af omsætningen', -c.lon, 'neg']);
+  return r;
+}
+
+function kontoHTML(b, c){
+  if (c.oms <= 0){
+    return '<p class="verdict">Du bygger ikke ekstra kapacitet ind i denne pakke, så der er ikke en indtægt at regne imod. ' +
+      'Investeringen skal hentes på arbejdsmiljø, færre fejlbehandlinger og en salon, kunderne bliver længere i. ' +
+      'Vil du se tallene for en ekstra plads, så gå tilbage og læg én til.</p>';
+  }
+  const raekker = kontoData(c).map(x => '<tr class="' + x[2] + '"><td>' + x[0] + '</td><td class="n">' +
+    (x[1] < 0 ? '&minus;' + kr(-x[1]) : kr(x[1])) + '</td></tr>').join('');
+  return '<table class="konto"><tbody>' + raekker +
+    '<tr class="sum"><td>Ekstra bidrag pr. måned</td><td class="n">' + kr(c.bidrag) + '</td></tr>' +
+    '<tr class="neg"><td>Leasingydelse, ' + S.leasing + ' mdr.' +
+      (S.faser ? '<small>Kun fase 1 — fase 2 kommer først om 12 måneder</small>' : '') +
+      '</td><td class="n">&minus;' + kr(c.yd) + '</td></tr>' +
+    '<tr class="sum slut"><td>' + (c.netto >= 0 ? 'Tilbage til dig hver måned' : 'Mangler hver måned') +
+      '</td><td class="n">' + (c.netto >= 0 ? kr(c.netto) : '&minus;' + kr(-c.netto)) + '</td></tr>' +
+    '</tbody></table><p class="verdict" style="margin-top:16px">' + verdikt(b, c) + '</p>';
+}
+
+function verdikt(b, c){
+  if (c.oms <= 0) return 'Pakken bygger ikke ekstra kapacitet ind, så den skal måles på arbejdsmiljø og kundeoplevelse frem for på en tilbagebetalingstid.';
+  const t = [];
+  if (c.netto >= 0){
+    t.push('Investeringen bærer sig selv fra første måned og lægger <b>' + kr(c.netto) + '</b> oveni hver måned.');
+  } else {
+    t.push('Der mangler <b>' + kr(-c.netto) + '</b> om måneden i at dække ydelsen. Prøv en længere løbetid, ' +
+      'flere behandlinger — eller del pakken op i to faser.');
+  }
+  if (c.maaneder) t.push('Pakken er tjent hjem på cirka <b>' + Math.ceil(c.maaneder) + ' måneder</b>, ' +
+    'alene på den ekstra kapacitet og kun hvis den bliver booket som sat ovenfor.');
+  if (S.bemanding === 'mig') t.push('Din egen tid indgår ikke i regnestykket — den er den reelle omkostning ved at fylde pladsen selv.');
+  if (S.faser && S.plan.headspa > 0) t.push('Head Spa-pladsen ligger i fase 2 og indgår derfor ikke i regnestykket her — den kommer først, når fase 1 har tjent ind.');
+  if (S.bemanding === 'ansat') t.push('Lønnen er den store post. Regner du med en ansat, er det hende og ikke stolen, der afgør, om det hænger sammen.');
+  return t.join(' ');
+}
+
+function trinPris(){
+  const b = beregn();
+  const c = businesscase(b.betal);
+  const P = S.plan, lev = levering();
+  const pct = Math.round(b.spar / b.visVejl * 100);
 
   const dele = [];
   if (P.klip) dele.push(pl(P.klip, 'klippeplads', 'klippepladser'));
@@ -784,66 +977,107 @@ function trinPris(){
   if (P.farve) dele.push(pl(P.farve, 'farvebar', 'farvebarer'));
   if (P.headspa) dele.push(pl(P.headspa, 'Head Spa-plads', 'Head Spa-pladser'));
 
-  const pct = Math.round(b.spar / b.vejl * 100);
+  const bemandingValg = [
+    ['mig','Jeg fylder den selv'],
+    ['ansat','Jeg ansætter en frisør'],
+    ['leje','Jeg lejer stolen ud']
+  ];
+
   return head('Trin 6 af 6 · Pakke og pris',
     'Din pakke og din pris',
     'Sådan ser din salon ud, når alt er talt med. Alle priser er ekskl. moms — og som altid ser du både den vejledende pris og vores.') +
 
     '<section><div class="pricehead">' +
       '<div><div class="pkg">' + pakkenavn() + '</div>' +
-      '<p class="sub">' + dele.join(' · ') + ' · ' + STILARTER.find(s => s.id === S.stil).navn + ' · ' + b.stk + ' dele i alt</p></div>' +
-      '<div class="pricetag"><b id="figPris">' + kr(b.pris) + '</b><s>' + kr(b.vejl) + '</s>' +
+      '<p class="sub">' + dele.join(' · ') + ' · ' + STILARTER.find(x => x.id === S.stil).navn + ' · ' + b.stk + ' dele i alt</p></div>' +
+      '<div class="pricetag"><b id="figPris">' + kr(b.betal) + '</b><s>' + kr(b.visVejl) + '</s>' +
         '<span class="badge">&minus;' + pct + '%</span></div>' +
+      '<p class="sub" style="margin-top:-10px">' +
+        (S.faser ? 'Prisen er fase 1. Fase 2 lyder på ' + kr(b.f2) + ' og kommer om 12 måneder. ' : '') +
+        (b.byt > 0 ? 'Pakken koster ' + kr(b.visPris) + ', og vi har trukket ' + kr(b.byt) +
+          ' fra for dit gamle inventar.' : 'Alle beløb er ekskl. moms.') +
+      '</p>' +
       '<dl class="figs">' +
         '<div class="fig save"><dt>Du sparer</dt><dd>' + kr(b.spar) + '</dd><small>under vejledende pris</small></div>' +
+        (b.byt > 0 ? '<div class="fig save"><dt>Modregning</dt><dd>&minus;' + kr(b.byt) + '</dd><small>skøn, dit gamle inventar</small></div>' : '') +
         '<div class="fig"><dt>Leasing</dt><dd id="figYd">' + kr(c.yd) + '</dd><small>pr. måned i ' + S.leasing + ' mdr.</small></div>' +
-        '<div class="fig"><dt>Inkl. moms</dt><dd>' + kr(b.pris * 1.25) + '</dd><small>til orientering</small></div>' +
+        '<div class="fig"><dt>Inkl. moms</dt><dd>' + kr(b.betal * 1.25) + '</dd><small>til orientering</small></div>' +
       '</dl>' +
     '</div></section>' +
+
+    '<section><h3>Skal det hele komme nu?</h3>' +
+      '<div class="chips">' +
+        '<button class="chip" data-act="faser" data-val="0" aria-pressed="' + (!S.faser) + '">Alt på én gang</button>' +
+        '<button class="chip" data-act="faser" data-val="1" aria-pressed="' + (!!S.faser) + '">Del op i to faser</button>' +
+      '</div>' +
+      '<p class="lede" style="font-size:14.5px; margin-top:14px">' +
+        (S.faser
+          ? 'Fase 1 er det, der løser problemet: pladser, arbejdsmiljø og det, der skal fungere fra dag ét. ' +
+            'Fase 2 er venteområde, reception og det, der løfter oplevelsen — det kan vente til, at fase 1 har tjent lidt ind.'
+          : 'Alt leveres og monteres på én gang. Har du ikke råd til det hele nu, kan pakken deles i to — så betaler du kun for fase 1 i første omgang.') +
+      '</p></section>' +
+
+    '<section><h3>Hvornår står den i salonen?</h3><div class="lev">' +
+      '<span class="prik"></span><div class="hoved">' +
+        '<b>Uge ' + lev.uge + '&ndash;' + (lev.uge + 1) + ', ' + lev.aar + '</b>' +
+        '<small>' + (lev.uger <= 3
+          ? 'Alt i pakken er lagervarer. Vi kører ud, så snart du siger til.'
+          : 'Pakken indeholder bestillingsvarer med længere leveringstid. Lagervarerne kan komme før, hvis du har brug for det.') +
+        ' Monteringen lægges på én lukkedag, så du mister én dags omsætning frem for en uges rod' +
+        (S.gammelt === 'behold' ? '.' : ' — og det gamle inventar kører med retur i samme vogn.') + '</small>' +
+      '</div></div></section>' +
 
     '<section><h3>Løbetid</h3>' +
       '<div class="seg">' + [12,24,36,48].map(m =>
         '<button data-act="leasing" data-val="' + m + '" aria-pressed="' + (S.leasing === m) + '">' + m + ' mdr.</button>').join('') + '</div>' +
-      '<p class="lede" style="font-size:14px; margin-top:12px">Restværdi 100 kr., så der ikke venter en stor slutbetaling. ' +
+      '<p class="lede" style="font-size:14px; margin-top:14px">Restværdi 100 kr., så der ikke venter en stor slutbetaling. ' +
       'Finansiering forudsætter en positiv kreditgodkendelse. Beregningen er vejledende.</p></section>' +
 
     '<section><h3>Regner det hjem?</h3><div class="case">' +
       '<h4>Din business case</h4>' +
-      '<div class="slider"><div class="top"><label for="sBon">Gennemsnitlig behandling, ekskl. moms</label><output id="outBon">' + kr(S.bon) + '</output></div>' +
-        '<input type="range" id="sBon" data-slider="bon" min="250" max="1200" step="10" value="' + S.bon + '"></div>' +
-      '<div class="slider"><div class="top"><label for="sBeh">Bookede behandlinger pr. dag på den nye plads</label><output id="outBeh">' + S.behDag + '</output></div>' +
-        '<input type="range" id="sBeh" data-slider="behDag" min="2" max="10" step="1" value="' + S.behDag + '"></div>' +
-      '<div class="slider"><div class="top"><label for="sDb">Dækningsbidrag efter produkter og løn</label><output id="outDb">' + S.db + ' %</output></div>' +
-        '<input type="range" id="sDb" data-slider="db" min="15" max="70" step="5" value="' + S.db + '"></div>' +
-      (P.headspa > 0 ?
-      '<div class="slider"><div class="top"><label for="sHs">Head Spa-behandlinger pr. uge</label><output id="outHs">' + S.hsUge + '</output></div>' +
-        '<input type="range" id="sHs" data-slider="hsUge" min="0" max="25" step="1" value="' + S.hsUge + '"></div>' : '') +
-      '<p class="verdict" id="caseTekst">' + caseTekst(b, c) + '</p>' +
+      (c.ekstraKlip > 0
+        ? '<div><p class="lede" style="font-size:14px; margin:0 0 10px">Hvem skal stå på ' +
+            (c.ekstraKlip === 1 ? 'den nye plads' : 'de nye pladser') + '?</p><div class="chips">' +
+            bemandingValg.map(x => '<button class="chip" data-act="bemanding" data-val="' + x[0] + '" aria-pressed="' +
+              (S.bemanding === x[0]) + '">' + x[1] + '</button>').join('') + '</div></div>'
+        : '') +
+      (c.ekstraKlip > 0 && S.bemanding === 'leje'
+        ? '<div class="slider"><div class="top"><label for="sLeje">Stolleje pr. plads pr. måned</label><output id="outLeje">' + kr(S.stolleje) + '</output></div>' +
+          '<input type="range" id="sLeje" data-slider="stolleje" min="2000" max="9000" step="250" value="' + S.stolleje + '"></div>'
+        : '') +
+      (c.ekstraKlip > 0 && S.bemanding !== 'leje'
+        ? '<div class="slider"><div class="top"><label for="sBon">Gennemsnitlig behandling, ekskl. moms</label><output id="outBon">' + kr(S.bon) + '</output></div>' +
+          '<input type="range" id="sBon" data-slider="bon" min="250" max="1200" step="10" value="' + S.bon + '"></div>' +
+          '<div class="slider"><div class="top"><label for="sBeh">Bookede behandlinger pr. dag på den nye plads</label><output id="outBeh">' + S.behDag + '</output></div>' +
+          '<input type="range" id="sBeh" data-slider="behDag" min="1" max="10" step="1" value="' + S.behDag + '"></div>'
+        : '') +
+      (c.ekstraKlip > 0 && S.bemanding === 'ansat'
+        ? '<div class="slider"><div class="top"><label for="sLon">Løn til frisøren, andel af hendes omsætning</label><output id="outLon">' + S.lonpct + ' %</output></div>' +
+          '<input type="range" id="sLon" data-slider="lonpct" min="30" max="60" step="5" value="' + S.lonpct + '"></div>'
+        : '') +
+      (P.headspa > 0 && !S.faser
+        ? '<div class="slider"><div class="top"><label for="sHs">Head Spa-behandlinger pr. uge</label><output id="outHs">' + S.hsUge + '</output></div>' +
+          '<input type="range" id="sHs" data-slider="hsUge" min="0" max="25" step="1" value="' + S.hsUge + '"></div>'
+        : '') +
+      '<div id="kontoBox">' + kontoHTML(b, c) + '</div>' +
     '</div></section>' +
 
-    '<section><h3>Din stykliste</h3><div class="scroll"><table class="lines">' +
-      '<thead><tr><th>Vare</th><th class="n">Stk.</th><th class="n">Vejledende</th><th class="n">Din pris</th></tr></thead>' +
-      '<tbody>' + rk.join('') + '</tbody></table></div>' +
+    '<section><h3>Din stykliste</h3>' +
+      (S.faser
+        ? '<div class="fasehead"><h4>Fase 1 &mdash; nu</h4><span>' + kr(b.f1) + '</span></div>' + styklisteTabel(b, 1) +
+          '<div class="fasehead"><h4>Fase 2 &mdash; om 12 måneder</h4><span>' + kr(b.f2) + '</span></div>' + styklisteTabel(b, 2)
+        : styklisteTabel(b, null)) +
+      (b.byt > 0
+        ? '<div class="callout" style="margin-top:14px"><b>Modregning:</b> vi trækker skønsmæssigt ' + kr(b.byt) +
+          ' fra for dit nuværende inventar, så du lander på ' + kr(b.betal) +
+          '. Beløbet fastsættes endeligt, når vi har set det.</div>'
+        : '') +
       '<p class="lede" style="font-size:13.5px; margin-top:12px">Produktnavne og priser er eksempeldata til denne prototype.</p></section>' +
 
+    hjaelp() +
     nav(true, 'Få pakken som rapport', 'frem');
 }
 
-function caseTekst(b, c){
-  if (c.oms <= 0){
-    return 'Du bygger ikke ekstra kapacitet ind i denne pakke — investeringen skal hentes på arbejdsmiljø, ' +
-      'færre fejlbehandlinger og en salon, kunderne bliver længere i. Vil du se tallene for en ekstra plads, ' +
-      'så gå tilbage og læg én til.';
-  }
-  const dele = [];
-  if (c.omsKlip > 0) dele.push(c.ekstraKlip + ' ekstra klippeplads' + (c.ekstraKlip === 1 ? '' : 'er') + ' giver ' + kr(c.omsKlip) + ' i ekstra omsætning om måneden');
-  if (c.omsHs > 0) dele.push('Head Spa lægger ' + kr(c.omsHs) + ' oveni');
-  const netto = c.netto >= 0
-    ? 'Det er <b>' + kr(c.netto) + ' mere om måneden</b>, end leasingydelsen koster dig — fra den første måned.'
-    : 'Det dækker ikke helt ydelsen på ' + kr(c.yd) + '. Der mangler <b>' + kr(-c.netto) + ' om måneden</b> — prøv en længere løbetid, eller regn med lidt flere behandlinger.';
-  const pb = c.maaneder ? ' Hele pakken er tjent hjem på cirka <b>' + Math.ceil(c.maaneder) + ' måneder</b> — alene på den ekstra kapacitet, og kun hvis den bliver booket som sat ovenfor.' : '';
-  return dele.join('. ') + '. Med ' + S.db + ' % i dækningsbidrag bliver det ' + kr(c.dbKr) + ' om måneden til dig. ' + netto + pb;
-}
 
 function trinLead(){
   const L = S.lead;
@@ -877,9 +1111,9 @@ function trinLead(){
 function trinRapport(){
   return head('Rapport',
     'Din rapport er klar',
-    'Hele oplægget samlet ét sted. Hent det som fil, eller print det direkte — og tag de næste skridt, når du er klar.') +
+    'Hele oplægget samlet ét sted: din plan, indsigterne, styklisten, leveringen, prisen og finansieringen — klar til revisoren, kompagnonen eller banken.') +
     '<div class="actions no-print" style="margin-top:24px">' +
-      '<button class="btn primary" data-act="hent">Hent rapporten</button>' +
+      '<button class="btn primary" data-act="hent">Hent rapport som PDF</button>' +
       '<button class="btn ghost" data-act="print">Print eller gem som PDF</button>' +
     '</div><p class="status no-print" id="dlStatus"></p>' +
     '<section><div class="report">' + rapportKrop() + '</div></section>' +
@@ -892,21 +1126,18 @@ function trinRapport(){
 
 /* ---------- rapportens indhold ---------- */
 function rapportKrop(){
-  const b = beregn(), c = businesscase(b.pris), P = S.plan;
+  const b = beregn(), P = S.plan, lev = levering();
+  const c = businesscase(b.betal);
   const dato = new Date().toLocaleDateString('da-DK', {day:'numeric', month:'long', year:'numeric'});
   const symTekst = {ryg:'fysisk belastning', ko:'kø og ventetid', farve:'farveresultat i salonens lys',
     luft:'kemi og lugt', lyd:'støjniveau', slidt:'slidt inventar', plads:'uudnyttet plads'};
   const ambTekst = {kapacitet:'mere kapacitet', arbejdsmiljo:'bedre arbejdsmiljø',
     oplevelse:'løft af kundeoplevelsen', nyt:'nyt indtægtsben'};
 
-  const rk = [];
-  b.grupper.forEach(g => {
-    rk.push('<tr class="grp"><td colspan="4">' + g.navn + '</td></tr>');
-    g.linjer.forEach(l => rk.push('<tr><td>' + l.navn + '</td><td class="n">' + l.stk + '</td>' +
-      '<td class="n was">' + kr(l.sumVejl) + '</td><td class="n">' + kr(l.sumPris) + '</td></tr>'));
-  });
-  rk.push('<tr class="sum"><td>I alt, ' + b.stk + ' dele</td><td class="n"></td><td class="n was">' +
-    kr(b.vejl) + '</td><td class="n">' + kr(b.pris) + '</td></tr>');
+  const styk = S.faser
+    ? '<div class="fasehead"><h4>Fase 1 &mdash; nu</h4><span>' + kr(b.f1) + '</span></div>' + styklisteTabel(b, 1) +
+      '<div class="fasehead"><h4>Fase 2 &mdash; om 12 måneder</h4><span>' + kr(b.f2) + '</span></div>' + styklisteTabel(b, 2)
+    : styklisteTabel(b, null);
 
   const ind = indsigter().map(i =>
     '<div class="insight ' + i.vaegt + '"><div class="insight-top"><span class="tag ' + i.vaegt + '">' +
@@ -925,6 +1156,7 @@ function rapportKrop(){
     '<div><dt>Det, der presser</dt><dd>' + (S.symptomer.map(s => symTekst[s]).join(', ') || 'ikke angivet') + '</dd></div>' +
     '<div><dt>Ambition</dt><dd>' + (S.ambition.map(a => ambTekst[a]).join(', ') || 'ikke angivet') + '</dd></div>' +
     '<div><dt>Tidshorisont</dt><dd>' + ({'0-3':'inden for 3 måneder','3-6':'om 3-6 måneder','6-12':'om 6-12 måneder','ved':'undersøger'})[S.lead.horisont] + '</dd></div>' +
+    '<div><dt>Det gamle inventar</dt><dd>' + ({byt:'byttes ind', bortkoer:'køres væk', behold:'beholdes'})[S.gammelt] + '</dd></div>' +
   '</dl></div>' +
 
   '<div><h3>Den nye salon</h3><dl class="spec" style="padding:0">' +
@@ -939,16 +1171,21 @@ function rapportKrop(){
 
   '<div><h3>Faglige indsigter</h3><div class="opts">' + ind + '</div></div>' +
 
-  '<div><h3>Pakke og pris</h3><div class="scroll"><table class="lines">' +
-    '<thead><tr><th>Vare</th><th class="n">Stk.</th><th class="n">Vejledende</th><th class="n">Din pris</th></tr></thead>' +
-    '<tbody>' + rk.join('') + '</tbody></table></div></div>' +
+  '<div><h3>Pakke og pris</h3>' + styk + '</div>' +
 
   '<div><h3>Økonomi</h3><dl class="figs">' +
-    '<div class="fig"><dt>Din pris</dt><dd>' + kr(b.pris) + '</dd><small>ekskl. moms</small></div>' +
-    '<div class="fig save"><dt>Under vejledende</dt><dd>' + kr(b.spar) + '</dd><small>' + Math.round(b.spar/b.vejl*100) + ' %</small></div>' +
+    '<div class="fig"><dt>' + (S.faser ? 'Fase 1 nu' : 'Din pris') + '</dt><dd>' + kr(b.betal) + '</dd><small>ekskl. moms</small></div>' +
+    (S.faser ? '<div class="fig"><dt>Fase 2 senere</dt><dd>' + kr(b.f2) + '</dd><small>om 12 måneder</small></div>' : '') +
+    '<div class="fig save"><dt>Under vejledende</dt><dd>' + kr(b.spar) + '</dd><small>' + Math.round(b.spar/b.visVejl*100) + ' %</small></div>' +
+    (b.byt > 0 ? '<div class="fig save"><dt>Modregning</dt><dd>&minus;' + kr(b.byt) + '</dd><small>skøn, gammelt inventar</small></div>' : '') +
     '<div class="fig"><dt>Leasing</dt><dd>' + kr(c.yd) + '</dd><small>pr. md. i ' + S.leasing + ' mdr.</small></div>' +
-    (c.dbKr > 0 ? '<div class="fig"><dt>Ekstra dækningsbidrag</dt><dd>' + kr(c.dbKr) + '</dd><small>pr. måned</small></div>' : '') +
-  '</dl><p class="verdict" style="margin-top:14px">' + caseTekst(b, c) + '</p></div>' +
+  '</dl><div style="margin-top:18px">' + kontoHTML(b, c) + '</div></div>' +
+
+  '<div><h3>Levering</h3><div class="lev"><span class="prik"></span><div class="hoved">' +
+    '<b>Uge ' + lev.uge + '&ndash;' + (lev.uge + 1) + ', ' + lev.aar + '</b>' +
+    '<small>' + (lev.uger <= 3 ? 'Alt i pakken er lagervarer.' : 'Pakken indeholder bestillingsvarer med længere leveringstid.') +
+    ' Monteringen lægges på én lukkedag' + (S.gammelt === 'behold' ? '.' : ', og det gamle inventar kører med retur i samme vogn.') +
+    '</small></div></div></div>' +
 
   '<div><h3>Næste skridt</h3><ul style="margin:0; padding-left:20px; color:var(--ink-2); line-height:1.8">' +
     '<li>Book en gratis fremvisning — vi kører ud med stolene, så de kan prøves i din egen salon.</li>' +
@@ -958,42 +1195,199 @@ function rapportKrop(){
 
   '<div class="callout"><b>Om tallene:</b> Denne rapport er lavet i en prototype. Produktnavne og priser er eksempeldata, ' +
     'og beregningen af leasing og business case er vejledende — ikke et tilbud. Alle beløb er ekskl. moms. ' +
-    'Beregningen forudsætter 22 åbningsdage om måneden og ' + S.db + ' % dækningsbidrag efter produkter og løn.</div>';
+    'Beregningen forudsætter 22 åbningsdage om måneden, 8 % produktforbrug' +
+    (S.bemanding === 'ansat' ? ' og ' + S.lonpct + ' % løn til frisøren' : '') + '.</div>';
 }
 
-function rapportFil(){
-  const titel = 'Salonrapport · ' + (S.lead.salon.trim() || 'Din salon');
-  const css = document.querySelector('style').textContent;
-  return '<!doctype html><html lang="da"><head><meta charset="utf-8">' +
-    '<meta name="viewport" content="width=device-width, initial-scale=1">' +
-    '<title>' + esc(titel) + '</title>' +
-    '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700&family=Bodoni+Moda:opsz,wght@6..96,400;6..96,500&family=IBM+Plex+Mono:wght@400;500&display=swap">' +
-    '<style>' + css + '\nbody{padding:40px 24px}\n.wrap{max-width:820px}\n</style></head><body>' +
-    '<div class="wrap"><div class="report">' + rapportKrop() + '</div>' +
-    '<p class="lede" style="font-size:12.5px; margin-top:28px">Salonbyggeren · prototype · ' +
-    new Date().toLocaleDateString('da-DK') + '</p></div></body></html>';
+function pdfRapport(){
+  const JsPDF = window.jspdf && window.jspdf.jsPDF;
+  if (!JsPDF) return null;
+  const doc = new JsPDF({unit:'mm', format:'a4'});
+  if (typeof doc.autoTable !== 'function') return null;
+
+  const M = 18, W = 210, B = W - M * 2;
+  const b = beregn(), lev = levering(), P = S.plan;
+  const c = businesscase(b.betal);
+  const nkr = n => kr(n).replace('−', '-');
+  let y = M;
+
+  const plads = h => { if (y + h > 272){ doc.addPage(); y = M; } };
+  const rubrik = t => {
+    plads(18);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(135);
+    doc.text(t.toUpperCase(), M, y); y += 2.2;
+    doc.setDrawColor(222); doc.setLineWidth(0.3); doc.line(M, y, W - M, y);
+    y += 6.5; doc.setTextColor(25);
+  };
+  const brod = (t, st, sz) => {
+    doc.setFont('helvetica', st || 'normal'); doc.setFontSize(sz || 10); doc.setTextColor(45);
+    const l = doc.splitTextToSize(t, B);
+    plads(l.length * 4.5 + 3);
+    doc.text(l, M, y); y += l.length * 4.5 + 3.5; doc.setTextColor(25);
+  };
+  const parvis = rows => {
+    doc.autoTable({ startY:y, margin:{left:M, right:M}, body:rows, theme:'plain',
+      styles:{font:'helvetica', fontSize:9.5, cellPadding:{top:1.7, bottom:1.7, left:0, right:0}},
+      columnStyles:{0:{cellWidth:58, textColor:[120,120,120]}, 1:{cellWidth:'auto', textColor:[25,25,25]}} });
+    y = doc.lastAutoTable.finalY + 7;
+  };
+
+  /* forside */
+  doc.setDrawColor(20); doc.setLineWidth(0.8); doc.line(M, y, W - M, y); y += 7;
+  doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(135);
+  doc.text('SALONRAPPORT', M, y);
+  doc.setFont('helvetica','normal');
+  doc.text(new Date().toLocaleDateString('da-DK', {day:'numeric', month:'long', year:'numeric'}), W - M, y, {align:'right'});
+  y += 11;
+  doc.setTextColor(20); doc.setFont('helvetica','bold'); doc.setFontSize(21);
+  doc.splitTextToSize(pakkenavn(), B).forEach(l => { doc.text(l, M, y); y += 8.5; });
+  y += 1;
+  doc.setFont('helvetica','normal'); doc.setFontSize(10.5); doc.setTextColor(90);
+  doc.text('Udarbejdet til ' + (S.lead.salon.trim() || 'din salon') +
+    (S.lead.navn.trim() ? ' ved ' + S.lead.navn.trim() : ''), M, y);
+  y += 11; doc.setTextColor(25);
+
+  const symT = {ryg:'fysisk belastning', ko:'kø og ventetid', farve:'farveresultat i salonens lys',
+    luft:'kemi og lugt', lyd:'støjniveau', slidt:'slidt inventar', plads:'uudnyttet plads'};
+  const ambT = {kapacitet:'mere kapacitet', arbejdsmiljo:'bedre arbejdsmiljø',
+    oplevelse:'løft af kundeoplevelsen', nyt:'nyt indtægtsben'};
+
+  rubrik('Udgangspunkt');
+  parvis([
+    ['Salonen i dag', pl(S.nu.klip,'klippeplads','klippepladser') + ', ' + pl(S.nu.vask,'vaskeplads','vaskepladser')],
+    ['Inventarets alder', (S.nu.alder === '16+' ? 'over 15' : S.nu.alder) + ' år'],
+    ['Det, der presser', S.symptomer.map(x => symT[x]).join(', ') || 'ikke angivet'],
+    ['Ambition', S.ambition.map(x => ambT[x]).join(', ') || 'ikke angivet'],
+    ['Det gamle inventar', ({byt:'byttes ind', bortkoer:'køres væk', behold:'beholdes'})[S.gammelt]],
+    ['Tidshorisont', ({'0-3':'inden for 3 måneder','3-6':'om 3-6 måneder','6-12':'om 6-12 måneder','ved':'undersøger'})[S.lead.horisont]]
+  ]);
+
+  rubrik('Den nye salon');
+  parvis([
+    ['Klippepladser', String(P.klip)], ['Vaskepladser', String(P.vask)],
+    ['Farvebar', P.farve ? String(P.farve) : '—'], ['Loungepladser', P.lounge ? String(P.lounge) : '—'],
+    ['Reception', P.reception ? String(P.reception) : '—'], ['Head Spa-pladser', P.headspa ? String(P.headspa) : '—'],
+    ['Niveau og stil', NIVEAUER.find(n => n.id === S.niveau).navn + ' · ' + STILARTER.find(x => x.id === S.stil).navn],
+    ['Levering', 'uge ' + lev.uge + '-' + (lev.uge + 1) + ', ' + lev.aar]
+  ]);
+
+  rubrik('Faglige indsigter');
+  indsigter().forEach(i => {
+    plads(20);
+    doc.setFont('helvetica','bold'); doc.setFontSize(8); doc.setTextColor(135);
+    doc.text((i.vaegt === 'kritisk' ? 'VIGTIGST' : i.vaegt === 'anbefalet' ? 'ANBEFALET' : 'GODT AT VIDE'), M, y);
+    y += 4.6;
+    brod(i.titel, 'bold', 11);
+    brod(i.tekst, 'normal', 9.5);
+    y += 2;
+  });
+
+  const varer = fase => {
+    const body = [];
+    b.grupper.forEach(g => {
+      const l = g.linjer.filter(x => fase === null || x.fase === fase);
+      if (!l.length) return;
+      body.push([{content:g.navn, colSpan:4, styles:{fontStyle:'bold', fillColor:[243,242,240], textColor:[25,25,25]}}]);
+      l.forEach(x => body.push([x.navn + (x.lager ? '' : '  (bestilling)'), String(x.stk), nkr(x.sumVejl), nkr(x.sumPris)]));
+    });
+    return body;
+  };
+  const tabel = (fase, titel, sum) => {
+    plads(30);
+    doc.setFont('helvetica','bold'); doc.setFontSize(11); doc.setTextColor(20);
+    doc.text(titel, M, y); doc.text(nkr(sum), W - M, y, {align:'right'}); y += 4;
+    doc.autoTable({ startY:y, margin:{left:M, right:M}, head:[['Vare','Stk.','Vejledende','Din pris']],
+      body:varer(fase),
+      styles:{font:'helvetica', fontSize:9, cellPadding:2, lineColor:[228,226,222], lineWidth:0.1},
+      headStyles:{fillColor:[255,255,255], textColor:[135,135,135], fontSize:7.5, lineWidth:{bottom:0.3}},
+      columnStyles:{1:{halign:'right', cellWidth:14}, 2:{halign:'right', cellWidth:26, textColor:[150,150,150]},
+                    3:{halign:'right', cellWidth:26, fontStyle:'bold'}} });
+    y = doc.lastAutoTable.finalY + 8;
+  };
+
+  rubrik('Pakke og pris');
+  if (S.faser){
+    tabel(1, 'Fase 1 — nu', b.f1);
+    tabel(2, 'Fase 2 — om 12 måneder', b.f2);
+  } else {
+    tabel(null, 'Hele pakken', b.pris);
+  }
+
+  rubrik('Økonomi');
+  const oek = [
+    [S.faser ? 'Fase 1, ekskl. moms' : 'Din pris, ekskl. moms', nkr(b.betal)],
+    ['Vejledende pris', nkr(b.visVejl)],
+    ['Du sparer', nkr(b.spar) + '  (' + Math.round(b.spar / b.visVejl * 100) + ' %)']
+  ];
+  if (S.faser) oek.push(['Fase 2, om 12 måneder', nkr(b.f2)]);
+  if (b.byt > 0) oek.push(['Modregning, gammelt inventar', '-' + nkr(b.byt)]);
+  oek.push(['Leasing, ' + S.leasing + ' mdr.', nkr(c.yd) + ' pr. måned']);
+  parvis(oek);
+
+  if (c.oms > 0){
+    const rows = kontoData(c).map(x => [x[0], (x[1] < 0 ? '-' : '') + nkr(Math.abs(x[1]))]);
+    rows.push([{content:'Ekstra bidrag pr. måned', styles:{fontStyle:'bold'}},
+               {content:nkr(c.bidrag), styles:{fontStyle:'bold'}}]);
+    rows.push(['Leasingydelse, ' + S.leasing + ' mdr.', '-' + nkr(c.yd)]);
+    rows.push([{content:(c.netto >= 0 ? 'Tilbage til dig hver måned' : 'Mangler hver måned'), styles:{fontStyle:'bold'}},
+               {content:(c.netto >= 0 ? '' : '-') + nkr(Math.abs(c.netto)), styles:{fontStyle:'bold'}}]);
+    plads(40);
+    doc.autoTable({ startY:y, margin:{left:M, right:M}, body:rows, theme:'plain',
+      styles:{font:'helvetica', fontSize:9.5, cellPadding:{top:1.9, bottom:1.9, left:0, right:0}},
+      columnStyles:{0:{cellWidth:'auto'}, 1:{cellWidth:34, halign:'right'}} });
+    y = doc.lastAutoTable.finalY + 6;
+  }
+  brod(verdikt(b, c).replace(/<\/?b>/g, ''), 'normal', 9.5);
+
+  rubrik('Næste skridt');
+  brod('Book en gratis fremvisning — vi kører ud med stolene, så de kan prøves i din egen salon.', 'normal', 9.5);
+  brod('Besøg showroomet på Mariendalsvej 32, 8800 Viborg. Hverdage 9-16, personlig rundvisning.', 'normal', 9.5);
+  brod('Søg finansiering: 12-48 måneder, 100 kr. i restværdi, svar på kreditgodkendelsen samme dag.', 'normal', 9.5);
+
+  const sider = doc.internal.getNumberOfPages();
+  for (let i = 1; i <= sider; i++){
+    doc.setPage(i);
+    doc.setFont('helvetica','normal'); doc.setFontSize(7.5); doc.setTextColor(150);
+    doc.text('Prototype · produkter og priser er eksempeldata · beregninger er vejledende og ikke et tilbud · alle beløb ekskl. moms',
+      M, 287);
+    doc.text(i + ' / ' + sider, W - M, 287, {align:'right'});
+  }
+  return doc;
 }
 
 async function hentRapport(){
   const st = document.getElementById('dlStatus');
   const navn = 'salonrapport-' + (S.lead.salon.trim() || S.lead.navn.trim() || 'salon')
-    .toLowerCase().replace(/[^a-z0-9æøå]+/g, '-').replace(/^-|-$/g, '') + '.html';
-  st.className = 'status no-print'; st.textContent = 'Klargør rapporten…';
-  const fil = rapportFil();
+    .toLowerCase().replace(/[^a-z0-9æøå]+/g, '-').replace(/^-|-$/g, '') + '.pdf';
+  st.className = 'status no-print'; st.textContent = 'Bygger rapporten…';
+
+  let blob;
+  try {
+    const doc = pdfRapport();
+    if (!doc){
+      st.className = 'status err no-print';
+      st.textContent = 'PDF-motoren kunne ikke indlæses her. Brug "Print eller gem som PDF" i stedet.';
+      return;
+    }
+    blob = doc.output('blob');
+  } catch (e){
+    st.className = 'status err no-print';
+    st.textContent = 'Rapporten kunne ikke bygges. Brug "Print eller gem som PDF" i stedet.';
+    return;
+  }
+
   try {
     const dl = (window.claude && window.claude.use) ? await window.claude.use('downloads') : null;
     if (dl){
-      await dl.save({filename: navn, data: fil});
-      st.className = 'status ok no-print';
-      st.textContent = 'Rapporten er hentet som ' + navn;
-      return;
+      await dl.save({filename: navn, data: blob});
+    } else {
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url; a.download = navn; document.body.appendChild(a); a.click(); a.remove();
+      setTimeout(() => URL.revokeObjectURL(url), 4000);
     }
-    const url = URL.createObjectURL(new Blob([fil], {type:'text/html'}));
-    const a = document.createElement('a');
-    a.href = url; a.download = navn; document.body.appendChild(a); a.click(); a.remove();
-    setTimeout(() => URL.revokeObjectURL(url), 4000);
     st.className = 'status ok no-print';
-    st.textContent = 'Rapporten er hentet som ' + navn + '.';
+    st.textContent = 'Rapporten er hentet som ' + navn;
   } catch (e){
     const kode = e && e.code ? e.code : 'ukendt';
     st.className = 'status err no-print';
@@ -1031,9 +1425,12 @@ function railHTML(){
   }
   let note = '<div class="rail-note"><b>Til sidst</b><span>Pris og pakke vises, når salonen står rigtigt. Først formen — så tallene.</span></div>';
   if (S.step >= 5){
-    const b = beregn(), c = businesscase(b.pris);
-    r += raekke('Dele i alt', b.stk);
-    r += '<div><dt style="font-weight:600; color:var(--ink)">Din pris</dt><dd style="font-weight:600">' + kr(b.pris) + '</dd></div>';
+    const b = beregn(), c = businesscase(b.betal);
+    r += raekke('Dele i alt', S.faser ? b.f1Stk + ' i fase 1' : b.stk);
+    if (b.byt > 0) r += raekke('Modregning', '&minus;' + kr(b.byt));
+    r += '<div><dt style="font-weight:600; color:var(--ink)">' + (S.faser ? 'Fase 1' : 'Din pris') +
+      '</dt><dd style="font-weight:600">' + kr(b.betal) + '</dd></div>';
+    if (S.faser) r += raekke('Fase 2 senere', kr(b.f2));
     r += raekke('Leasing, ' + S.leasing + ' mdr.', kr(c.yd));
     note = '<div class="rail-note"><b>Ærlig pris</b><span>Du ser altid både den vejledende pris og vores. Alle beløb er ekskl. moms.</span></div>';
   }
@@ -1111,7 +1508,9 @@ document.addEventListener('click', ev => {
     S.symptomer = ['ryg','ko']; S.ambition = ['kapacitet'];
     S.plan = {klip:3, vask:2, farve:1, lounge:3, reception:1, headspa:0};
     S.niveau = 'kvalitet'; S.stil = 'nordisk'; S.leasing = 36;
-    S.bon = 520; S.behDag = 4; S.db = 40; S.hsUge = 5;
+    S.bon = 520; S.behDag = 4; S.hsUge = 5;
+    S.bemanding = 'ansat'; S.lonpct = 45; S.stolleje = 4500;
+    S.gammelt = 'byt'; S.faser = false; S.kontakt = null;
     S.tilvalg = {}; S.rort = {};
     S.lead = {navn:'', salon:'', email:'', tlf:'', post:'', horisont:'3-6'};
     render(); return;
@@ -1147,17 +1546,23 @@ document.addEventListener('click', ev => {
     synkTilvalg(); render(); return;
   }
   if (act === 'leasing'){ S.leasing = parseInt(val, 10); render(); return; }
+  if (act === 'faser'){ S.faser = val === '1'; render(); return; }
+  if (act === 'bemanding'){ S.bemanding = val; render(); return; }
+  if (act === 'gammelt'){ S.gammelt = val; S.senest = 'gammelt:' + val; render(); return; }
+  if (act === 'kontakt'){ S.kontakt = val; render(); return; }
 });
 
 document.addEventListener('input', ev => {
   const s = ev.target.closest('[data-slider]');
   if (s){
     S[s.dataset.slider] = parseInt(s.value, 10);
-    const b = beregn(), c = businesscase(b.pris);
-    const sæt = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
-    sæt('outBon', kr(S.bon)); sæt('outBeh', S.behDag); sæt('outDb', S.db + ' %'); sæt('outHs', S.hsUge);
-    const t = document.getElementById('caseTekst');
-    if (t) t.innerHTML = caseTekst(b, c);
+    const b = beregn();
+    const c = businesscase(b.betal);
+    const saet = (id, v) => { const e = document.getElementById(id); if (e) e.textContent = v; };
+    saet('outBon', kr(S.bon)); saet('outBeh', S.behDag); saet('outLon', S.lonpct + ' %');
+    saet('outLeje', kr(S.stolleje)); saet('outHs', S.hsUge);
+    const kb = document.getElementById('kontoBox');
+    if (kb) kb.innerHTML = kontoHTML(b, c);
     return;
   }
   const f = ev.target.closest('[data-felt]');
